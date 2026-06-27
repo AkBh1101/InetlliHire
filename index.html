@@ -1,1654 +1,1188 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>TalentScope · HR Analytics</title>
+  <title>IntelliHire · HR Analytics</title>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════ DESIGN TOKENS ═══════════════════════════════ */
+    /* ══ TOKENS ══════════════════════════════════════════════════════════════ */
     :root {
-      --ink: #070B14;
-      --panel: #0E1523;
-      --panel2: #141E30;
-      --card: #111827;
-      --rim: #1F2D45;
-      --rim2: #263548;
-      --accent: #3B82F6;
-      --violet: #7C3AED;
-      --emerald: #10B981;
-      --amber: #F59E0B;
-      --rose: #F43F5E;
-      --cyan: #06B6D4;
-      --orange: #F97316;
-      --text: #F0F4FF;
-      --text2: #C8D5EE;
-      --muted: #7A93B8;
-      --dim: #3D5270;
-      --r: 12px;
-      --fhead: 'Space Grotesk', sans-serif;
-      --fbody: 'Inter', sans-serif;
-      --fmono: 'JetBrains Mono', monospace;
+      --paper:   #F5F1EB;
+      --paper2:  #EDE8DF;
+      --paper3:  #E4DDD1;
+      --ink:     #1A1714;
+      --ink2:    #3D3830;
+      --ink3:    #6B6157;
+      --rule:    #C8BFB0;
+      --rule2:   #B0A594;
+      --forest:  #2D5016;
+      --forest2: #3D6B20;
+      --sienna:  #A0402A;
+      --sienna2: #C05030;
+      --gold:    #8B6914;
+      --gold2:   #B08420;
+      --slate:   #2A3F5A;
+      --slate2:  #3A5070;
+      --sage:    #4A7050;
+      --fdisp:   'DM Serif Display', Georgia, serif;
+      --fbody:   'IBM Plex Sans', system-ui, sans-serif;
+      --fmono:   'IBM Plex Mono', 'Courier New', monospace;
+      --r:       4px;
     }
 
-    /* ═══════════════════════════ RESET & BASE ════════════════════════════════ */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      font-size: 15px;
-      scroll-behavior: smooth;
-    }
-
+    /* ══ RESET ═══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; scroll-behavior: smooth; }
     body {
-      background: var(--ink);
-      color: var(--text);
+      background: var(--paper);
+      color: var(--ink);
       font-family: var(--fbody);
       font-size: 0.933rem;
-      line-height: 1.6;
+      line-height: 1.65;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* subtle grid */
-    body::after {
+    /* Subtle ruled paper texture */
+    body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: linear-gradient(var(--rim) 1px, transparent 1px),
-        linear-gradient(90deg, var(--rim) 1px, transparent 1px);
-      background-size: 60px 60px;
-      opacity: .12;
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 27px,
+        var(--rule) 27px,
+        var(--rule) 28px
+      );
+      opacity: 0.18;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* ═══════════════════════════ LAYOUT ══════════════════════════════════════ */
-    .sidebar {
-      position: fixed;
-      left: 0;
+    /* ══ TOPNAV ══════════════════════════════════════════════════════════════ */
+    .topnav {
+      position: sticky;
       top: 0;
-      bottom: 0;
-      width: 256px;
-      background: var(--panel);
-      border-right: 1px solid var(--rim);
       z-index: 100;
+      background: var(--ink);
+      border-bottom: 3px solid var(--sienna);
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      height: 52px;
     }
 
-    .main {
-      margin-left: 256px;
-      min-height: 100vh;
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px;
+      border-right: 1px solid rgba(255,255,255,0.12);
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--sienna2);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .brand-name {
+      font-family: var(--fdisp);
+      font-size: 1.05rem;
+      color: #F5F1EB;
+      letter-spacing: 0.3px;
+    }
+
+    .brand-dot {
+      color: var(--sienna2);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-links::-webkit-scrollbar { display: none; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 16px;
+      height: 100%;
+      font-family: var(--fmono);
+      font-size: 0.68rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(245, 241, 235, 0.5);
+      cursor: pointer;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+      user-select: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+      position: relative;
+    }
+
+    .nav-link:hover { color: rgba(245,241,235,0.82); }
+    .nav-link.active {
+      color: #F5F1EB;
+      border-bottom-color: var(--gold2);
+    }
+
+    .nav-link.done { color: rgba(160,220,160,0.75); }
+    .nav-link.done.active { color: #aaffaa; }
+
+    .step-pip {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      flex-shrink: 0;
+      font-family: var(--fmono);
+    }
+
+    .nav-link.done .step-pip { background: rgba(100,200,100,0.25); }
+    .nav-link.active .step-pip { background: rgba(176,132,32,0.35); }
+
+    .nav-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255,255,255,0.15);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      border-left: 1px solid rgba(255,255,255,0.12);
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .status-pill {
+      padding: 3px 9px;
+      border-radius: 2px;
+      font-family: var(--fmono);
+      font-size: 0.62rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .pill-f { background: rgba(45,80,22,0.5); color: #aadea7; border: 1px solid rgba(80,160,60,0.3); }
+    .pill-s { background: rgba(42,63,90,0.5); color: #8ab4d8; border: 1px solid rgba(60,100,160,0.3); }
+    .pill-g { background: rgba(139,105,20,0.4); color: #d4a84b; border: 1px solid rgba(180,140,40,0.3); }
+
+    /* ══ PROGRESS STRIP ══════════════════════════════════════════════════════ */
+    .progress-strip {
+      background: var(--paper2);
+      border-bottom: 1px solid var(--rule);
+      padding: 8px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-family: var(--fmono);
+      font-size: 0.67rem;
+      color: var(--ink3);
+      letter-spacing: 1px;
       position: relative;
       z-index: 1;
     }
 
-    /* ═══════════════════════════ SIDEBAR ════════════════════════════════════ */
-    .brand {
-      padding: 22px 20px 16px;
-      border-bottom: 1px solid var(--rim);
-    }
-
-    .brand-mark {
+    .prog-segments {
       display: flex;
-      align-items: center;
-      gap: 11px;
-    }
-
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--accent), var(--violet));
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 17px;
-      box-shadow: 0 0 20px rgba(59, 130, 246, .35);
-    }
-
-    .brand-name {
-      font-family: var(--fhead);
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text);
-    }
-
-    .brand-sub {
-      font-family: var(--fmono);
-      font-size: 0.67rem;
-      color: var(--muted);
-      margin-top: 6px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    .nav {
-      padding: 16px 12px;
+      gap: 3px;
       flex: 1;
-      overflow-y: auto;
+      max-width: 240px;
     }
 
-    .nav-section {
-      font-family: var(--fmono);
-      font-size: 0.65rem;
-      color: var(--dim);
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      padding: 0 10px;
-      margin: 16px 0 6px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 9px 12px;
-      border-radius: 9px;
-      cursor: pointer;
-      color: var(--muted);
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all .15s;
-      margin-bottom: 2px;
-      user-select: none;
-      position: relative;
-    }
-
-    .nav-item:hover {
-      background: var(--panel2);
-      color: var(--text2);
-    }
-
-    .nav-item.active {
-      background: rgba(59, 130, 246, .12);
-      color: var(--accent);
-    }
-
-    .nav-item.active::before,
-    .nav-item.done::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 22%;
-      bottom: 22%;
-      width: 3px;
-      border-radius: 2px;
-    }
-
-    .nav-item.active::before {
-      background: var(--accent);
-    }
-
-    .nav-item.done::before {
-      background: var(--emerald);
-    }
-
-    .nav-item.done {
-      color: var(--emerald);
-    }
-
-    .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      font-weight: 500;
-      background: var(--panel2);
-      color: var(--muted);
-      flex-shrink: 0;
-      transition: all .15s;
-      border: 1px solid var(--rim);
-    }
-
-    .nav-item.active .step-num {
-      background: rgba(59, 130, 246, .2);
-      color: var(--accent);
-      border-color: rgba(59, 130, 246, .3);
-    }
-
-    .nav-item.done .step-num {
-      background: rgba(16, 185, 129, .15);
-      color: var(--emerald);
-      border-color: rgba(16, 185, 129, .3);
-    }
-
-    /* Pipeline tracker */
-    .sidebar-foot {
-      padding: 14px 20px 18px;
-      border-top: 1px solid var(--rim);
-    }
-
-    .pip-label {
-      font-family: var(--fmono);
-      font-size: 0.66rem;
-      color: var(--muted);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .pip-track {
-      display: flex;
-      gap: 4px;
-      height: 5px;
-    }
-
-    .pip-seg {
+    .prog-seg {
+      height: 3px;
       flex: 1;
-      background: var(--rim2);
-      border-radius: 3px;
+      background: var(--rule2);
+      border-radius: 0;
       transition: background .4s;
     }
 
-    .pip-seg.done {
-      background: var(--emerald);
-    }
+    .prog-seg.done { background: var(--forest2); }
+    .prog-seg.active { background: var(--gold2); }
 
-    .pip-seg.active {
-      background: var(--accent);
-      animation: pulse-seg 1.5s ease infinite;
-    }
-
-    .pip-pct {
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-top: 7px;
-    }
-
-    /* ═══════════════════════════ TOPBAR ══════════════════════════════════════ */
-    .topbar {
-      height: 60px;
-      background: rgba(14, 21, 35, .92);
-      border-bottom: 1px solid var(--rim);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 28px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      backdrop-filter: blur(16px);
-    }
-
-    .page-title {
-      font-family: var(--fhead);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .page-crumb {
-      font-family: var(--fmono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 1px;
-      margin-left: 14px;
-      opacity: .8;
-    }
-
-    .top-chips {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .chip {
-      padding: 4px 11px;
-      border-radius: 20px;
-      font-family: var(--fmono);
-      font-size: 0.67rem;
-      font-weight: 500;
-      letter-spacing: .5px;
-      border: 1px solid;
-    }
-
-    .chip-b {
-      color: #93c5fd;
-      border-color: rgba(59, 130, 246, .3);
-      background: rgba(59, 130, 246, .08);
-    }
-
-    .chip-g {
-      color: #6ee7b7;
-      border-color: rgba(16, 185, 129, .3);
-      background: rgba(16, 185, 129, .08);
-    }
-
-    .chip-v {
-      color: #c4b5fd;
-      border-color: rgba(124, 58, 237, .3);
-      background: rgba(124, 58, 237, .08);
-    }
-
-    /* ═══════════════════════════ CONTENT AREA ════════════════════════════════ */
-    .content {
-      padding: 28px 32px;
-      display: none;
-      animation: page-in .28s ease;
-    }
-
-    .content.active {
-      display: block;
-    }
-
-    /* ═══════════════════════════ CARDS ══════════════════════════════════════ */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--rim);
-      border-radius: var(--r);
-      padding: 22px 24px;
-      margin-bottom: 18px;
+    /* ══ CONTENT WRAPPER ═════════════════════════════════════════════════════ */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px 60px;
       position: relative;
-      overflow: hidden;
+      z-index: 1;
     }
 
-    .card::before {
+    .section {
+      display: none;
+      animation: fadein .25s ease;
+    }
+
+    .section.active { display: block; }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ PAGE HEADER ═════════════════════════════════════════════════════════ */
+    .page-header {
+      padding: 38px 0 24px;
+      border-bottom: 1px solid var(--rule2);
+      margin-bottom: 32px;
+    }
+
+    .page-eyebrow {
+      font-family: var(--fmono);
+      font-size: 0.65rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--sienna);
+      margin-bottom: 10px;
+    }
+
+    .page-header h1 {
+      font-family: var(--fdisp);
+      font-size: 2.8rem;
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .page-header h1 em {
+      font-style: italic;
+      color: var(--sienna);
+    }
+
+    .page-header p {
+      color: var(--ink3);
+      max-width: 560px;
+      font-size: 0.967rem;
+      line-height: 1.7;
+    }
+
+    .page-header h2 {
+      font-family: var(--fdisp);
+      font-size: 1.7rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    /* ══ SECTION TITLE ═══════════════════════════════════════════════════════ */
+    .sec-title {
+      font-family: var(--fdisp);
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .sec-sub {
+      font-family: var(--fmono);
+      font-size: 0.66rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+
+    /* ══ CARDS / PANELS ══════════════════════════════════════════════════════ */
+    .panel {
+      background: #FBF8F3;
+      border: 1px solid var(--rule);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .panel::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, .2), transparent);
-      pointer-events: none;
+      top: 0; left: 0; bottom: 0;
+      width: 3px;
+      background: var(--rule2);
     }
 
-    .card-header {
+    .panel.accent-forest::before { background: var(--forest); }
+    .panel.accent-sienna::before { background: var(--sienna); }
+    .panel.accent-gold::before   { background: var(--gold); }
+    .panel.accent-slate::before  { background: var(--slate); }
+    .panel.accent-sage::before   { background: var(--sage); }
+
+    .panel-header {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
-    .card-title {
-      font-family: var(--fhead);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.2px;
+    .panel-title {
+      font-family: var(--fdisp);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--ink);
     }
 
-    .card-sub {
+    .panel-meta {
       font-family: var(--fmono);
-      font-size: 0.68rem;
-      color: var(--muted);
+      font-size: 0.63rem;
+      color: var(--ink3);
+      letter-spacing: 1px;
+      text-transform: uppercase;
       margin-top: 3px;
-      letter-spacing: .5px;
     }
 
-    .g2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+    /* ══ GRIDS ═══════════════════════════════════════════════════════════════ */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .g5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+
+    /* ══ STAT TILES ══════════════════════════════════════════════════════════ */
+    .stat-tile {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--rule2);
+      padding: 16px 14px;
     }
 
-    .g3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
+    .stat-tile.t-forest { border-top-color: var(--forest); }
+    .stat-tile.t-sienna { border-top-color: var(--sienna); }
+    .stat-tile.t-gold   { border-top-color: var(--gold); }
+    .stat-tile.t-slate  { border-top-color: var(--slate); }
+    .stat-tile.t-sage   { border-top-color: var(--sage); }
 
-    .g4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .g5 {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-    }
-
-    /* ═══════════════════════════ KPI TILES ══════════════════════════════════ */
-    .kpi {
-      background: var(--panel2);
-      border: 1px solid var(--rim);
-      border-radius: 10px;
-      padding: 16px 15px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .kpi::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      opacity: .7;
-    }
-
-    .kpi.b::after {
-      background: var(--accent);
-    }
-
-    .kpi.p::after {
-      background: var(--violet);
-    }
-
-    .kpi.g::after {
-      background: var(--emerald);
-    }
-
-    .kpi.a::after {
-      background: var(--amber);
-    }
-
-    .kpi.r::after {
-      background: var(--rose);
-    }
-
-    .kpi.c::after {
-      background: var(--cyan);
-    }
-
-    .kpi-label {
+    .stat-label {
       font-family: var(--fmono);
-      font-size: 0.67rem;
-      color: var(--muted);
+      font-size: 0.63rem;
       letter-spacing: 1.5px;
       text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 4px;
     }
 
-    .kpi-value {
-      font-family: var(--fhead);
-      font-size: 1.7rem;
-      font-weight: 800;
-      margin-top: 5px;
+    .stat-value {
+      font-family: var(--fdisp);
+      font-size: 1.9rem;
+      color: var(--ink);
       line-height: 1;
     }
 
-    .kpi-sub {
+    .stat-tile.t-forest .stat-value { color: var(--forest); }
+    .stat-tile.t-sienna .stat-value { color: var(--sienna); }
+    .stat-tile.t-gold   .stat-value { color: var(--gold); }
+    .stat-tile.t-slate  .stat-value { color: var(--slate); }
+
+    .stat-note {
       font-size: 0.75rem;
-      color: var(--muted);
+      color: var(--ink3);
       margin-top: 4px;
     }
 
-    .kpi.b .kpi-value {
-      color: var(--accent);
-    }
-
-    .kpi.p .kpi-value {
-      color: #a78bfa;
-    }
-
-    .kpi.g .kpi-value {
-      color: var(--emerald);
-    }
-
-    .kpi.a .kpi-value {
-      color: var(--amber);
-    }
-
-    .kpi.r .kpi-value {
-      color: var(--rose);
-    }
-
-    .kpi.c .kpi-value {
-      color: var(--cyan);
-    }
-
-    /* ═══════════════════════════ BUTTONS ════════════════════════════════════ */
+    /* ══ BUTTONS ═════════════════════════════════════════════════════════════ */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       padding: 9px 18px;
-      border-radius: 9px;
       font-family: var(--fbody);
       font-size: 0.833rem;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      transition: all .15s;
-      position: relative;
-      overflow: hidden;
+      border-radius: var(--r);
+      transition: all .13s;
     }
 
-    .btn:disabled {
-      opacity: .38;
-      cursor: not-allowed;
-      transform: none !important;
-    }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
 
     .btn-primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(59, 130, 246, .25);
+      background: var(--forest);
+      color: #F5F1EB;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25);
     }
+    .btn-primary:hover:not(:disabled) { background: var(--forest2); }
 
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 28px rgba(59, 130, 246, .45);
+    .btn-danger {
+      background: var(--sienna);
+      color: #F5F1EB;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
     }
+    .btn-danger:hover:not(:disabled) { background: var(--sienna2); }
 
-    .btn-violet {
-      background: var(--violet);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(124, 58, 237, .25);
+    .btn-gold {
+      background: var(--gold);
+      color: #F5F1EB;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
     }
-
-    .btn-violet:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 28px rgba(124, 58, 237, .4);
-    }
-
-    .btn-emerald {
-      background: var(--emerald);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(16, 185, 129, .25);
-    }
-
-    .btn-emerald:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 28px rgba(16, 185, 129, .4);
-    }
+    .btn-gold:hover:not(:disabled) { background: var(--gold2); }
 
     .btn-ghost {
       background: transparent;
-      color: var(--muted);
-      border: 1px solid var(--rim2);
+      color: var(--ink2);
+      border: 1px solid var(--rule2);
+    }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--forest); color: var(--forest); }
+
+    .btn-sm { padding: 6px 13px; font-size: 0.78rem; }
+    .btn-lg { padding: 12px 24px; font-size: 1rem; }
+
+    /* ══ TAGS ════════════════════════════════════════════════════════════════ */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      font-family: var(--fmono);
+      font-size: 0.68rem;
+      border: 1px solid;
+      border-radius: 2px;
+      font-weight: 500;
+      letter-spacing: 0.3px;
     }
 
-    .btn-ghost:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .tag-f { color: var(--forest); border-color: rgba(45,80,22,.3); background: rgba(45,80,22,.07); }
+    .tag-s { color: var(--sienna); border-color: rgba(160,64,42,.3); background: rgba(160,64,42,.07); }
+    .tag-g { color: var(--gold); border-color: rgba(139,105,20,.3); background: rgba(139,105,20,.07); }
+    .tag-l { color: var(--slate); border-color: rgba(42,63,90,.3); background: rgba(42,63,90,.07); }
+    .tag-k { color: var(--ink2); border-color: var(--rule2); background: var(--paper2); }
 
-    .btn-sm {
-      padding: 6px 13px;
-      font-size: 0.78rem;
-    }
-
-    .btn-lg {
-      padding: 12px 24px;
-      font-size: 1rem;
-    }
-
-    /* ═══════════════════════════ TABLES ═════════════════════════════════════ */
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 9px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    /* ══ ALERTS ══════════════════════════════════════════════════════════════ */
+    .alert {
+      padding: 11px 16px;
+      margin-bottom: 14px;
       font-size: 0.833rem;
+      line-height: 1.5;
+      border-left: 4px solid;
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
     }
 
-    thead tr {
-      background: var(--panel2);
-    }
+    .alert-ok   { background: rgba(45,80,22,.07);  border-color: var(--forest);  color: var(--forest); }
+    .alert-err  { background: rgba(160,64,42,.07); border-color: var(--sienna);  color: var(--sienna); }
+    .alert-info { background: rgba(42,63,90,.07);  border-color: var(--slate);   color: var(--slate); }
+    .alert-warn { background: rgba(139,105,20,.07);border-color: var(--gold);    color: var(--gold); }
+
+    /* ══ TABLE ═══════════════════════════════════════════════════════════════ */
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.833rem; }
+
+    thead tr { background: var(--paper3); border-bottom: 2px solid var(--rule2); }
 
     th {
       font-family: var(--fmono);
-      font-size: 0.67rem;
-      color: var(--muted);
+      font-size: 0.64rem;
+      color: var(--ink3);
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      padding: 10px 13px;
-      border-bottom: 1px solid var(--rim);
+      letter-spacing: 1.2px;
+      padding: 9px 12px;
       text-align: left;
       font-weight: 500;
     }
 
     td {
-      padding: 10px 13px;
-      border-bottom: 1px solid rgba(31, 45, 69, .5);
-      font-size: 0.833rem;
-      color: var(--text2);
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink2);
     }
 
-    tr:last-child td {
-      border-bottom: none;
-    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(45,80,22,.04); }
 
-    tbody tr:hover td {
-      background: rgba(59, 130, 246, .04);
-    }
-
-    /* ═══════════════════════════ TAGS ═══════════════════════════════════════ */
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 9px;
-      border-radius: 5px;
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      font-weight: 500;
-      border: 1px solid;
-    }
-
-    .tag-b {
-      color: #93c5fd;
-      border-color: rgba(147, 197, 253, .25);
-      background: rgba(147, 197, 253, .08);
-    }
-
-    .tag-p {
-      color: #c4b5fd;
-      border-color: rgba(196, 181, 253, .25);
-      background: rgba(196, 181, 253, .08);
-    }
-
-    .tag-g {
-      color: #6ee7b7;
-      border-color: rgba(110, 231, 183, .25);
-      background: rgba(110, 231, 183, .08);
-    }
-
-    .tag-a {
-      color: #fde68a;
-      border-color: rgba(253, 230, 138, .25);
-      background: rgba(253, 230, 138, .08);
-    }
-
-    .tag-r {
-      color: #fca5a5;
-      border-color: rgba(252, 165, 165, .25);
-      background: rgba(252, 165, 165, .08);
-    }
-
-    .tag-c {
-      color: #67e8f9;
-      border-color: rgba(103, 232, 249, .25);
-      background: rgba(103, 232, 249, .08);
-    }
-
-    /* ═══════════════════════════ ALERTS ════════════════════════════════════ */
-    .alert {
-      padding: 12px 16px;
-      border-radius: 9px;
-      font-size: 0.833rem;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      border-left: 3px solid;
-      line-height: 1.5;
-    }
-
-    .alert-ok {
-      background: rgba(16, 185, 129, .08);
-      border-color: var(--emerald);
-      color: #6ee7b7;
-    }
-
-    .alert-err {
-      background: rgba(244, 63, 94, .08);
-      border-color: var(--rose);
-      color: #fca5a5;
-    }
-
-    .alert-info {
-      background: rgba(59, 130, 246, .08);
-      border-color: var(--accent);
-      color: #93c5fd;
-    }
-
-    .alert-warn {
-      background: rgba(245, 158, 11, .08);
-      border-color: var(--amber);
-      color: #fde68a;
-    }
-
-    /* ═══════════════════════════ LOADER ════════════════════════════════════ */
+    /* ══ LOADER ══════════════════════════════════════════════════════════════ */
     .loader-wrap {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(7, 11, 20, .88);
+      background: rgba(245,241,235,.88);
       z-index: 999;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: 18px;
-      backdrop-filter: blur(8px);
+      gap: 14px;
+      backdrop-filter: blur(4px);
     }
 
-    .loader-wrap.show {
-      display: flex;
-    }
+    .loader-wrap.show { display: flex; }
 
-    .loader-ring {
-      width: 52px;
-      height: 52px;
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--rule2);
+      border-top-color: var(--forest);
       border-radius: 50%;
-      border: 2px solid var(--rim2);
-      border-top-color: var(--accent);
-      animation: spin .75s linear infinite;
-      position: relative;
-    }
-
-    .loader-ring::after {
-      content: '';
-      position: absolute;
-      inset: 6px;
-      border-radius: 50%;
-      border: 2px solid var(--rim2);
-      border-bottom-color: var(--violet);
-      animation: spin .95s linear infinite reverse;
+      animation: spin .7s linear infinite;
     }
 
     .loader-text {
       font-family: var(--fmono);
-      font-size: 0.8rem;
-      color: var(--muted);
-      letter-spacing: .5px;
+      font-size: 0.75rem;
+      color: var(--ink2);
+      letter-spacing: 1px;
     }
 
     .loader-sub {
-      font-size: 0.72rem;
-      color: var(--dim);
+      font-size: 0.7rem;
+      color: var(--ink3);
     }
 
-    /* ═══════════════════════════ CHART TABS ════════════════════════════════ */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ══ CHART TABS ══════════════════════════════════════════════════════════ */
     .chart-tabs {
       display: flex;
-      gap: 7px;
+      gap: 0;
       flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .ctab {
-      padding: 5px 13px;
-      border-radius: 7px;
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      cursor: pointer;
-      border: 1px solid var(--rim2);
-      color: var(--muted);
-      background: transparent;
-      transition: all .13s;
-      letter-spacing: .3px;
-    }
-
-    .ctab:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .ctab.active {
-      background: rgba(59, 130, 246, .12);
-      border-color: var(--accent);
-      color: #93c5fd;
-    }
-
-    /* ═══════════════════════════ MODEL CARDS ═══════════════════════════════ */
-    .model-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 11px;
+      margin-bottom: 0;
+      border-bottom: 2px solid var(--rule);
       margin-bottom: 20px;
     }
 
-    .mcard {
-      background: var(--panel2);
-      border: 1px solid var(--rim2);
-      border-radius: 10px;
-      padding: 14px 13px;
-      position: relative;
-      overflow: hidden;
-      transition: border-color .2s;
+    .ctab {
+      padding: 7px 14px;
+      font-family: var(--fmono);
+      font-size: 0.67rem;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--ink3);
+      transition: all .12s;
+      text-transform: uppercase;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
     }
 
-    .mcard::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--rim2);
-      transition: background .2s;
+    .ctab:hover { color: var(--ink); }
+
+    .ctab.active {
+      color: var(--forest);
+      border-bottom-color: var(--forest);
+      background: rgba(45,80,22,.05);
     }
+
+    /* ══ MODEL CARDS ═════════════════════════════════════════════════════════ */
+    .model-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      border: 1px solid var(--rule);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .mcard {
+      padding: 16px 14px;
+      border-right: 1px solid var(--rule);
+      position: relative;
+      background: #FBF8F3;
+      transition: background .15s;
+    }
+
+    .mcard:last-child { border-right: none; }
 
     .mcard.best {
-      border-color: rgba(16, 185, 129, .4);
-    }
-
-    .mcard.best::before {
-      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+      background: rgba(45,80,22,.06);
+      border-top: 3px solid var(--forest);
+      margin-top: -1px;
     }
 
     .mcard-name {
       font-family: var(--fmono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: .5px;
+      font-size: 0.63rem;
+      color: var(--ink3);
+      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
     }
 
     .mcard-auc {
-      font-family: var(--fhead);
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
+      font-family: var(--fdisp);
+      font-size: 1.6rem;
+      color: var(--ink);
     }
 
-    .mcard.best .mcard-auc {
-      color: var(--emerald);
-    }
+    .mcard.best .mcard-auc { color: var(--forest); }
 
     .mcard-f1 {
       font-family: var(--fmono);
-      font-size: 0.75rem;
-      color: #c4b5fd;
-      font-weight: 500;
-      margin-top: 3px;
+      font-size: 0.72rem;
+      color: var(--slate);
+      margin-top: 2px;
     }
 
     .mcard-label {
-      font-size: 0.68rem;
-      color: var(--dim);
-      margin-top: 3px;
       font-family: var(--fmono);
+      font-size: 0.6rem;
+      color: var(--ink3);
+      margin-top: 2px;
+      letter-spacing: 0.5px;
     }
 
     .mcard-warn {
       font-family: var(--fmono);
-      font-size: 0.68rem;
-      color: var(--rose);
-      margin-top: 3px;
+      font-size: 0.63rem;
+      color: var(--sienna);
+      margin-top: 4px;
     }
 
     .mcard-crown {
       position: absolute;
-      top: 8px;
-      right: 9px;
-      font-size: 14px;
+      top: 6px; right: 8px;
+      font-size: 13px;
     }
 
-    /* ═══════════════════════════ VAL BADGE ═════════════════════════════════ */
-    .val-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-family: var(--fmono);
-      font-size: 0.68rem;
-      font-weight: 500;
-      background: rgba(16, 185, 129, .1);
-      color: var(--emerald);
-      border: 1px solid rgba(16, 185, 129, .25);
-      margin-left: 9px;
-    }
-
-    /* ═══════════════════════════ METRIC BARS ═══════════════════════════════ */
+    /* ══ METRIC BARS ═════════════════════════════════════════════════════════ */
     .mbar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .mbar-label {
+      font-family: var(--fmono);
+      font-size: 0.69rem;
+      color: var(--ink3);
+      width: 140px;
+      flex-shrink: 0;
+    }
+
+    .mbar-track {
+      flex: 1;
+      height: 4px;
+      background: var(--paper3);
+      border-radius: 0;
+    }
+
+    .mbar-fill {
+      height: 100%;
+      transition: width .5s ease;
+    }
+
+    .mbar-val {
+      font-family: var(--fmono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      width: 44px;
+      text-align: right;
+      color: var(--ink2);
+    }
+
+    /* ══ MISS BARS ═══════════════════════════════════════════════════════════ */
+    .miss-row {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 7px;
     }
 
-    .mbar-label {
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      color: var(--muted);
-      width: 130px;
-      flex-shrink: 0;
-    }
-
-    .mbar-track {
-      flex: 1;
-      height: 5px;
-      background: var(--rim2);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .mbar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width .6s ease;
-    }
-
-    .mbar-val {
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      font-weight: 600;
-      width: 46px;
-      text-align: right;
-    }
-
-    /* ═══════════════════════════ FEATURE TILES ═════════════════════════════ */
-    .ftile {
-      background: var(--panel2);
-      border: 1px solid var(--rim);
-      border-radius: 10px;
-      padding: 16px;
-    }
-
-    .ftile-icon {
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .ftile h3 {
-      font-family: var(--fhead);
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .ftile p {
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.65;
-    }
-
-    /* ═══════════════════════════ DIVIDERS & UTILS ═══════════════════════════ */
-    .divider {
-      height: 1px;
-      background: var(--rim);
-      margin: 18px 0;
-    }
-
-    .mt-2 {
-      margin-top: 10px;
-    }
-
-    .mt-3 {
-      margin-top: 16px;
-    }
-
-    .mb-2 {
-      margin-bottom: 10px;
-    }
-
-    .mb-3 {
-      margin-bottom: 18px;
-    }
-
-    .text-muted {
-      font-size: 0.833rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .mono {
-      font-family: var(--fmono);
-    }
-
-    .bold {
-      font-weight: 700;
-    }
-
-    /* ═══════════════════════════ HERO ═══════════════════════════════════════ */
-    .hero {
-      padding: 44px 0 32px;
-    }
-
-    .hero-eye {
-      font-family: var(--fmono);
-      font-size: 0.7rem;
-      letter-spacing: 3px;
-      color: var(--accent);
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      opacity: .9;
-    }
-
-    .hero h1 {
-      font-family: var(--fhead);
-      font-size: 2.6rem;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 14px;
-      color: var(--text);
-    }
-
-    .hero h1 .grad {
-      background: linear-gradient(135deg, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1rem;
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.75;
-      margin-bottom: 24px;
-    }
-
-    /* ═══════════════════════════ STORY CARD ════════════════════════════════ */
-    .story-card {
-      background: linear-gradient(135deg, rgba(59, 130, 246, .06), rgba(124, 58, 237, .06));
-      border: 1px solid rgba(59, 130, 246, .2);
-      border-radius: var(--r);
-      padding: 24px 26px;
-      margin-bottom: 18px;
-    }
-
-    .story-head {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-
-    .story-icon {
-      width: 44px;
-      height: 44px;
-      background: linear-gradient(135deg, var(--accent), var(--violet));
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    .story-title {
-      font-family: var(--fhead);
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .story-sub {
-      font-family: var(--fmono);
-      font-size: 0.67rem;
-      color: var(--muted);
-      margin-top: 3px;
-      letter-spacing: .5px;
-    }
-
-    .story-body {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    .story-body strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .story-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .sstat {
-      background: rgba(0, 0, 0, .25);
-      border-radius: 8px;
-      padding: 13px;
-      text-align: center;
-      border: 1px solid var(--rim);
-    }
-
-    .sstat-v {
-      font-family: var(--fhead);
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1;
-    }
-
-    .sstat-l {
-      font-family: var(--fmono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 5px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    /* ═══════════════════════════ PIPELINE VIS ═══════════════════════════════ */
-    .pip-vis {
-      display: flex;
-      align-items: center;
-      margin: 22px 0;
-      padding: 18px 22px;
-      background: var(--card);
-      border: 1px solid var(--rim);
-      border-radius: var(--r);
-    }
-
-    .pv-step {
-      flex: 1;
-      text-align: center;
-      position: relative;
-    }
-
-    .pv-step+.pv-step::before {
-      content: '→';
-      position: absolute;
-      left: -12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--dim);
-      font-size: 14px;
-    }
-
-    .pv-num {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--panel2);
-      border: 1px solid var(--rim2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 8px;
-      font-family: var(--fmono);
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--muted);
-      transition: all .3s;
-    }
-
-    .pv-label {
-      font-family: var(--fmono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      letter-spacing: .5px;
-      text-transform: uppercase;
-    }
-
-    .pv-step.done .pv-num {
-      background: rgba(16, 185, 129, .12);
-      border-color: rgba(16, 185, 129, .35);
-      color: var(--emerald);
-    }
-
-    .pv-step.active .pv-num {
-      background: rgba(59, 130, 246, .12);
-      border-color: rgba(59, 130, 246, .35);
-      color: var(--accent);
-      box-shadow: 0 0 14px rgba(59, 130, 246, .25);
-      animation: pulse-seg 1.5s infinite;
-    }
-
-    .pv-step.done .pv-label {
-      color: var(--emerald);
-    }
-
-    .pv-step.active .pv-label {
-      color: var(--accent);
-    }
-
-    /* ═══════════════════════════ INSIGHTS SECTION ═══════════════════════════ */
-    .insight-section {
-      margin-bottom: 18px;
-    }
-
-    .insight-banner {
-      background: linear-gradient(135deg, rgba(59, 130, 246, .08), rgba(124, 58, 237, .08));
-      border: 1px solid rgba(59, 130, 246, .25);
-      border-radius: var(--r);
-      padding: 22px 26px 14px;
-      margin-bottom: 20px;
-    }
-
-    .insight-banner-title {
-      font-family: var(--fhead);
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    .insight-banner-sub {
-      font-size: 0.833rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .insight-card {
-      background: var(--card);
-      border: 1px solid var(--rim);
-      border-radius: var(--r);
-      overflow: hidden;
-      margin-bottom: 16px;
-    }
-
-    .insight-card-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 18px 22px 14px;
-      border-bottom: 1px solid var(--rim);
-      background: var(--panel2);
-    }
-
-    .insight-num {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--fmono);
-      font-size: 0.78rem;
-      font-weight: 700;
-      background: rgba(59, 130, 246, .15);
-      color: var(--accent);
-    }
-
-    .insight-title {
-      font-family: var(--fhead);
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .insight-finding {
-      font-size: 0.833rem;
-      color: var(--muted);
-      line-height: 1.65;
-      flex: 1;
-    }
-
-    .insight-finding strong {
-      color: var(--text2);
-      font-weight: 600;
-    }
-
-    .insight-ref {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 8px;
-      font-family: var(--fmono);
-      font-size: 0.68rem;
-      color: var(--accent);
-      text-decoration: none;
-      opacity: .8;
-      transition: opacity .12s;
-    }
-
-    .insight-ref:hover {
-      opacity: 1;
-    }
-
-    .insight-body {
-      padding: 18px 22px;
-    }
-
-    .insight-chart {
-      width: 100%;
-      border-radius: 8px;
-    }
-
-    .insight-conclusion {
-      background: linear-gradient(135deg, rgba(16, 185, 129, .07), rgba(6, 182, 212, .07));
-      border: 1px solid rgba(16, 185, 129, .25);
-      border-radius: var(--r);
-      padding: 20px 24px;
-      margin-top: 10px;
-    }
-
-    .insight-conclusion-title {
-      font-family: var(--fhead);
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--emerald);
-      margin-bottom: 8px;
-    }
-
-    .insight-conclusion p {
-      font-size: 0.867rem;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-
-    .insight-conclusion strong {
-      color: var(--text2);
-    }
-
-    /* ═══════════════════════════ INTERPRETABILITY ═══════════════════════════ */
-    .interp-card {
-      background: linear-gradient(135deg, rgba(59, 130, 246, .05), rgba(124, 58, 237, .05));
-      border: 1px solid rgba(59, 130, 246, .2);
-      border-radius: var(--r);
-      padding: 20px 22px;
-      margin-bottom: 16px;
-    }
-
-    .interp-card-title {
-      font-family: var(--fhead);
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--text);
-    }
-
-    .feat-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(31, 45, 69, .5);
-    }
-
-    .feat-item:last-child {
-      border-bottom: none;
-    }
-
-    .feat-rank {
-      font-family: var(--fmono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      width: 22px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .feat-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 3px;
-    }
-
-    .feat-dir {
-      font-size: 0.8rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    .feat-bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-top: 6px;
-    }
-
-    .feat-bar-track {
-      flex: 1;
-      height: 4px;
-      background: var(--rim2);
-      border-radius: 2px;
-      max-width: 200px;
-    }
-
-    .feat-bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      background: var(--accent);
-    }
-
-    .feat-bar-pct {
-      font-family: var(--fmono);
-      font-size: 0.72rem;
-      color: var(--accent);
-    }
-
-    .lr-item {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(31, 45, 69, .4);
-    }
-
-    .lr-item:last-child {
-      border-bottom: none;
-    }
-
-    .lr-feat {
-      font-size: 0.833rem;
-      color: var(--text2);
-      flex: 1;
-    }
-
-    .lr-coef {
-      font-family: var(--fmono);
-      font-size: 0.78rem;
-      font-weight: 600;
-      width: 65px;
-      text-align: right;
-    }
-
-    /* ═══════════════════════════ SELECT ════════════════════════════════════ */
-    .sel {
-      padding: 9px 13px;
-      background: var(--panel2);
-      border: 1px solid var(--rim2);
-      color: var(--text);
-      border-radius: 9px;
-      font-family: var(--fbody);
-      font-size: 0.833rem;
-      cursor: pointer;
-      outline: none;
-      transition: border-color .14s;
-    }
-
-    .sel:focus {
-      border-color: var(--accent);
-    }
-
-    /* ═══════════════════════════ MISS BARS ════════════════════════════════ */
-    .miss-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-
     .miss-name {
       font-family: var(--fmono);
-      font-size: 0.72rem;
-      color: var(--muted);
+      font-size: 0.68rem;
+      color: var(--ink3);
       width: 175px;
       flex-shrink: 0;
     }
 
     .miss-bar {
       flex: 1;
-      height: 5px;
-      background: var(--rim2);
-      border-radius: 3px;
+      height: 4px;
+      background: var(--paper3);
     }
 
-    .miss-fill {
-      height: 100%;
-      border-radius: 3px;
+    .miss-fill { height: 100%; }
+    .miss-pct { font-family: var(--fmono); font-size: 0.68rem; width: 40px; text-align: right; }
+
+    /* ══ FEAT TILES ══════════════════════════════════════════════════════════ */
+    .ftile {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      padding: 18px 16px;
+      border-top: 2px solid var(--rule2);
     }
 
-    .miss-pct {
+    .ftile-icon { font-size: 20px; margin-bottom: 8px; }
+
+    .ftile h3 {
+      font-family: var(--fdisp);
+      font-size: 0.95rem;
+      font-weight: 400;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .ftile p { font-size: 0.8rem; color: var(--ink3); line-height: 1.65; }
+
+    /* ══ VAL BADGE ═══════════════════════════════════════════════════════════ */
+    .val-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
       font-family: var(--fmono);
-      font-size: 0.72rem;
-      width: 40px;
+      font-size: 0.64rem;
+      background: rgba(45,80,22,.1);
+      color: var(--forest);
+      border: 1px solid rgba(45,80,22,.25);
+      margin-left: 9px;
+    }
+
+    /* ══ SELECT ══════════════════════════════════════════════════════════════ */
+    .sel {
+      padding: 8px 12px;
+      background: #FBF8F3;
+      border: 1px solid var(--rule2);
+      color: var(--ink);
+      font-family: var(--fbody);
+      font-size: 0.833rem;
+      cursor: pointer;
+      outline: none;
+      border-radius: var(--r);
+    }
+
+    .sel:focus { border-color: var(--forest); }
+
+    /* ══ DIVIDER / UTILS ═════════════════════════════════════════════════════ */
+    .divider { height: 1px; background: var(--rule); margin: 20px 0; }
+    .mt-2 { margin-top: 10px; }
+    .mt-3 { margin-top: 18px; }
+    .mb-2 { margin-bottom: 10px; }
+    .mb-3 { margin-bottom: 18px; }
+    .text-muted { font-size: 0.833rem; color: var(--ink3); line-height: 1.6; }
+    .mono { font-family: var(--fmono); }
+    .bold { font-weight: 600; }
+    .fade-in { animation: fadein .3s ease; }
+
+    /* ══ HOME HERO ═══════════════════════════════════════════════════════════ */
+    .hero {
+      padding: 44px 0 32px;
+      border-bottom: 1px solid var(--rule2);
+      margin-bottom: 32px;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--fmono);
+      font-size: 0.65rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--sienna);
+      margin-bottom: 12px;
+    }
+
+    .hero h1 {
+      font-family: var(--fdisp);
+      font-size: 3.2rem;
+      font-weight: 400;
+      line-height: 1.08;
+      color: var(--ink);
+      letter-spacing: -1px;
+      margin-bottom: 14px;
+    }
+
+    .hero h1 em { font-style: italic; color: var(--sienna); }
+
+    .hero-lead {
+      font-size: 1rem;
+      color: var(--ink3);
+      max-width: 540px;
+      line-height: 1.75;
+      margin-bottom: 26px;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ══ DOSSIER STATS ═══════════════════════════════════════════════════════ */
+    .dossier-stats {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 0;
+      border: 1px solid var(--rule2);
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .dstat {
+      padding: 18px 16px;
+      border-right: 1px solid var(--rule2);
+      background: var(--paper2);
+    }
+
+    .dstat:last-child { border-right: none; }
+
+    .dstat-v {
+      font-family: var(--fdisp);
+      font-size: 2rem;
+      color: var(--sienna);
+      line-height: 1;
+    }
+
+    .dstat-l {
+      font-family: var(--fmono);
+      font-size: 0.64rem;
+      color: var(--ink3);
+      margin-top: 6px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    /* ══ PIPELINE VIS ════════════════════════════════════════════════════════ */
+    .pip-vis {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid var(--rule);
+      overflow: hidden;
+      margin: 24px 0;
+    }
+
+    .pv-step {
+      flex: 1;
+      text-align: center;
+      padding: 16px 8px;
+      border-right: 1px solid var(--rule);
+      position: relative;
+      background: #FBF8F3;
+      transition: background .2s;
+    }
+
+    .pv-step:last-child { border-right: none; }
+
+    .pv-num {
+      font-family: var(--fmono);
+      font-size: 0.65rem;
+      color: var(--ink3);
+      margin-bottom: 6px;
+    }
+
+    .pv-label {
+      font-family: var(--fmono);
+      font-size: 0.64rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink3);
+    }
+
+    .pv-step.done { background: rgba(45,80,22,.06); }
+    .pv-step.done .pv-num { color: var(--forest); }
+    .pv-step.done .pv-label { color: var(--forest); }
+
+    .pv-step.active { background: rgba(139,105,20,.07); }
+    .pv-step.active .pv-num { color: var(--gold); }
+    .pv-step.active .pv-label { color: var(--gold); }
+
+    .pv-step.done::after {
+      content: '✓';
+      position: absolute;
+      top: 8px; right: 8px;
+      font-size: 10px;
+      color: var(--forest);
+    }
+
+    /* ══ INSIGHT CARDS ═══════════════════════════════════════════════════════ */
+    .insight-banner {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--forest);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+
+    .insight-banner-title {
+      font-family: var(--fdisp);
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .insight-banner-sub {
+      font-size: 0.867rem;
+      color: var(--ink3);
+      line-height: 1.65;
+    }
+
+    .insight-card {
+      background: #FBF8F3;
+      border: 1px solid var(--rule);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .insight-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper2);
+    }
+
+    .insight-num {
+      font-family: var(--fdisp);
+      font-size: 1.6rem;
+      color: var(--sienna);
+      line-height: 1;
+      width: 36px;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .insight-title {
+      font-family: var(--fdisp);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .insight-finding {
+      font-size: 0.833rem;
+      color: var(--ink3);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .insight-finding strong { color: var(--ink2); font-weight: 600; }
+
+    .insight-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 7px;
+      font-family: var(--fmono);
+      font-size: 0.65rem;
+      color: var(--forest);
+      text-decoration: none;
+      opacity: .8;
+      transition: opacity .12s;
+    }
+
+    .insight-ref:hover { opacity: 1; }
+
+    .insight-body { padding: 20px 22px; }
+
+    .insight-conclusion {
+      background: rgba(45,80,22,.07);
+      border: 1px solid rgba(45,80,22,.2);
+      border-left: 4px solid var(--forest);
+      padding: 20px 24px;
+      margin-top: 10px;
+    }
+
+    .insight-conclusion-title {
+      font-family: var(--fdisp);
+      font-size: 1rem;
+      color: var(--forest);
+      margin-bottom: 8px;
+    }
+
+    .insight-conclusion p {
+      font-size: 0.867rem;
+      color: var(--ink3);
+      line-height: 1.75;
+    }
+
+    .insight-conclusion strong { color: var(--ink2); }
+
+    /* ══ INTERP CARDS ════════════════════════════════════════════════════════ */
+    .interp-card {
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--slate);
+      padding: 20px 22px;
+      margin-bottom: 16px;
+    }
+
+    .interp-card-title {
+      font-family: var(--fdisp);
+      font-size: 1rem;
+      font-weight: 400;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .feat-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .feat-item:last-child { border-bottom: none; }
+
+    .feat-rank {
+      font-family: var(--fmono);
+      font-size: 0.7rem;
+      color: var(--ink3);
+      width: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feat-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+
+    .feat-dir { font-size: 0.78rem; color: var(--ink3); line-height: 1.5; }
+
+    .feat-bar-wrap { display: flex; align-items: center; gap: 9px; margin-top: 5px; }
+
+    .feat-bar-track { flex: 1; height: 3px; background: var(--paper3); max-width: 200px; }
+
+    .feat-bar-fill { height: 100%; background: var(--forest); }
+
+    .feat-bar-pct { font-family: var(--fmono); font-size: 0.68rem; color: var(--forest); }
+
+    .lr-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .lr-item:last-child { border-bottom: none; }
+
+    .lr-feat { font-size: 0.833rem; color: var(--ink2); flex: 1; }
+
+    .lr-coef {
+      font-family: var(--fmono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 65px;
       text-align: right;
     }
 
-    /* ═══════════════════════════ ANIMATIONS ════════════════════════════════ */
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    /* ══ BODY STORY ══════════════════════════════════════════════════════════ */
+    .story-body {
+      font-size: 0.9rem;
+      color: var(--ink3);
+      line-height: 1.85;
     }
 
-    @keyframes page-in {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse-seg {
-
-      0%,
-      100% {
-        opacity: 1
-      }
-
-      50% {
-        opacity: .4
-      }
-    }
-
-    @keyframes count-in {
-      from {
-        opacity: 0;
-        transform: translateY(5px)
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0)
-      }
-    }
-
-    .fade-in {
-      animation: count-in .35s ease forwards;
-    }
+    .story-body strong { color: var(--ink2); font-weight: 600; }
   </style>
 </head>
-
 <body>
 
-  <!-- ── LOADER ─────────────────────────────────────────────────────────── -->
+  <!-- ── LOADER ──────────────────────────────────────────────────────────── -->
   <div class="loader-wrap" id="loader">
-    <div class="loader-ring"></div>
+    <div class="loader-spinner"></div>
     <div class="loader-text" id="ldr-txt">Processing</div>
     <div class="loader-sub" id="ldr-sub">please wait…</div>
   </div>
 
-  <!-- ── SIDEBAR ───────────────────────────────────────────────────────── -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">
-        <div class="brand-icon">⚡</div>
-        <div class="brand-name">TalentScope</div>
-      </div>
-      <div class="brand-sub">HR · ML Analytics</div>
+  <!-- ── TOP NAV ─────────────────────────────────────────────────────────── -->
+  <nav class="topnav">
+    <div class="brand-block">
+      <div class="brand-mark">⚡</div>
+      <div class="brand-name">Talent<span class="brand-dot">Scope</span></div>
     </div>
-    <nav class="nav" id="nav-el">
-      <div class="nav-item active" data-s="home" onclick="goTo('home',this)"><span class="step-num">⌂</span>Dashboard
+    <div class="nav-links" id="nav-el">
+      <div class="nav-link active" data-s="home" onclick="goTo('home',this)">
+        <span class="step-pip">⌂</span>Overview
       </div>
-      <div class="nav-section">Pipeline</div>
-      <div class="nav-item" data-s="data" onclick="goTo('data',this)"><span class="step-num">1</span>Load Data</div>
-      <div class="nav-item" data-s="eda" onclick="goTo('eda',this)"><span class="step-num">2</span>Explore (EDA)</div>
-      <div class="nav-item" data-s="prep" onclick="goTo('prep',this)"><span class="step-num">3</span>Preprocess</div>
-      <div class="nav-item" data-s="train" onclick="goTo('train',this)"><span class="step-num">4</span>Train Models
+      <div class="nav-link" data-s="data" onclick="goTo('data',this)">
+        <span class="step-pip">1</span>Load Data
       </div>
-      <div class="nav-section">Analysis</div>
-      <div class="nav-item" data-s="insights" onclick="goTo('insights',this)"><span class="step-num">★</span>Key
-        Insights</div>
-      <div class="nav-item" data-s="interp" onclick="goTo('interp',this)"><span
-          class="step-num">★</span>Interpretability</div>
-      <div class="nav-item" data-s="pred" onclick="goTo('pred',this)"><span class="step-num">5</span>Predict</div>
-    </nav>
-    <div class="sidebar-foot">
-      <div class="pip-label">Pipeline Progress</div>
-      <div class="pip-track">
-        <div class="pip-seg" id="ps1"></div>
-        <div class="pip-seg" id="ps2"></div>
-        <div class="pip-seg" id="ps3"></div>
-        <div class="pip-seg" id="ps4"></div>
-        <div class="pip-seg" id="ps5"></div>
+      <div class="nav-link" data-s="eda" onclick="goTo('eda',this)">
+        <span class="step-pip">2</span>Explore
       </div>
-      <div class="pip-pct" id="pip-pct">0 / 5 complete</div>
+      <div class="nav-link" data-s="prep" onclick="goTo('prep',this)">
+        <span class="step-pip">3</span>Preprocess
+      </div>
+      <div class="nav-link" data-s="train" onclick="goTo('train',this)">
+        <span class="step-pip">4</span>Train
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-link" data-s="insights" onclick="goTo('insights',this)">
+        <span class="step-pip">★</span>Insights
+      </div>
+      <div class="nav-link" data-s="interp" onclick="goTo('interp',this)">
+        <span class="step-pip">★</span>Interpretability
+      </div>
+      <div class="nav-link" data-s="pred" onclick="goTo('pred',this)">
+        <span class="step-pip">5</span>Predict
+      </div>
     </div>
-  </aside>
+    <div class="nav-right">
+      <span class="status-pill pill-f">19K Rows</span>
+      <span class="status-pill pill-s">5 Models</span>
+      <span class="status-pill pill-g">Val Metrics</span>
+    </div>
+  </nav>
 
-  <!-- ── MAIN ──────────────────────────────────────────────────────────── -->
+  <!-- ── PROGRESS STRIP ─────────────────────────────────────────────────── -->
+  <div class="progress-strip">
+    <span>Pipeline</span>
+    <div class="prog-segments">
+      <div class="prog-seg" id="ps1"></div>
+      <div class="prog-seg" id="ps2"></div>
+      <div class="prog-seg" id="ps3"></div>
+      <div class="prog-seg" id="ps4"></div>
+      <div class="prog-seg" id="ps5"></div>
+    </div>
+    <span id="pip-pct">0 / 5 complete</span>
+  </div>
+
+  <!-- ── MAIN ───────────────────────────────────────────────────────────── -->
   <div class="main">
-    <div class="topbar">
-      <div style="display:flex;align-items:baseline">
-        <div class="page-title" id="pg-title">Dashboard</div>
-        <div class="page-crumb" id="pg-crumb">HR JOB-CHANGE PREDICTION</div>
-      </div>
-      <div class="top-chips">
-        <div class="chip chip-b">19,158 TRAIN ROWS</div>
-        <div class="chip chip-v">5 ML MODELS</div>
-        <div class="chip chip-g">VAL-SET METRICS</div>
-      </div>
-    </div>
 
-    <!-- ════════ HOME ════════ -->
-    <div class="content active" id="sec-home">
+    <!-- ════ HOME ════ -->
+    <div class="section active" id="sec-home">
       <div class="hero">
-        <div class="hero-eye">HR Analytics Platform</div>
-        <h1>Who's <span class="grad">Leaving</span><br>Your Company?</h1>
-        <p>An end-to-end ML pipeline that identifies data scientists at risk of switching jobs — giving HR teams time to
-          act before talent walks out the door.</p>
-        <div style="display:flex;gap:11px">
+        <div class="hero-eyebrow">HR Analytics Platform · Data Science Attrition</div>
+        <h1>Who's About to<br><em>Leave</em> Your Team?</h1>
+        <p class="hero-lead">An end-to-end ML pipeline that identifies data scientists at risk of switching jobs — giving HR teams time to act before talent walks out the door.</p>
+        <div class="hero-actions">
           <button class="btn btn-primary btn-lg" onclick="autoPipeline()">⚡ Run Full Pipeline</button>
-          <button class="btn btn-ghost btn-lg"
-            onclick="goTo('insights',document.querySelector('[data-s=insights]'))">View Research Insights →</button>
+          <button class="btn btn-ghost btn-lg" onclick="goTo('insights',document.querySelector('[data-s=insights]'))">Read Research Insights →</button>
+        </div>
+        <div class="dossier-stats">
+          <div class="dstat"><div class="dstat-v">19K</div><div class="dstat-l">Candidates</div></div>
+          <div class="dstat"><div class="dstat-v">25%</div><div class="dstat-l">Seek Jobs</div></div>
+          <div class="dstat"><div class="dstat-v">13</div><div class="dstat-l">Input Features</div></div>
+          <div class="dstat"><div class="dstat-v">5</div><div class="dstat-l">ML Models</div></div>
         </div>
       </div>
 
-      <!-- Business Story -->
-      <div class="story-card">
-        <div class="story-head">
-          <div class="story-icon">💼</div>
+      <div class="panel accent-sienna mb-3">
+        <div class="panel-header">
           <div>
-            <div class="story-title">The Business Problem</div>
-            <div class="story-sub">WHY THIS PROJECT EXISTS</div>
+            <div class="panel-title">The Business Problem</div>
+            <div class="panel-meta">Why this project exists</div>
           </div>
         </div>
         <div class="story-body">
-          <strong>Employee attrition costs 50–200% of annual salary</strong> per departure — in recruiting fees,
-          onboarding, and lost productivity.
-          Yet most HR teams only discover someone is leaving after they resign.<br><br>
-          This platform analyses <strong>19,158 data scientists</strong> who completed training programmes.
-          Using 13 features — from city development index to years of experience — we train 5 ML models to predict
-          <strong>which employees are actively seeking a new job right now</strong>, weeks before they apply
-          elsewhere.<br><br>
-          The output is a probability score per employee. HR can then prioritise high-risk individuals for
-          targeted interventions — retention bonuses, promotions, or role redesign — <em>before</em> the resignation
-          letter arrives.
-        </div>
-        <div class="story-stats">
-          <div class="sstat">
-            <div class="sstat-v">19K</div>
-            <div class="sstat-l">Candidates</div>
-          </div>
-          <div class="sstat">
-            <div class="sstat-v">25%</div>
-            <div class="sstat-l">Seek Jobs</div>
-          </div>
-          <div class="sstat">
-            <div class="sstat-v">13</div>
-            <div class="sstat-l">Input Features</div>
-          </div>
-          <div class="sstat">
-            <div class="sstat-v">5</div>
-            <div class="sstat-l">ML Models</div>
-          </div>
+          <strong>Employee attrition costs 50–200% of annual salary</strong> per departure — in recruiting fees, onboarding, and lost productivity. Yet most HR teams only discover someone is leaving after they resign.<br><br>
+          This platform analyses <strong>19,158 data scientists</strong> who completed training programmes. Using 13 features — from city development index to years of experience — we train 5 ML models to predict <strong>which employees are actively seeking a new job right now</strong>, weeks before they apply elsewhere.<br><br>
+          The output is a probability score per employee. HR can then prioritise high-risk individuals for targeted interventions — retention bonuses, promotions, or role redesign — <em>before</em> the resignation letter arrives.
         </div>
       </div>
 
@@ -1656,286 +1190,236 @@
         <div class="ftile">
           <div class="ftile-icon">🌆</div>
           <h3>City Development Index</h3>
-          <p>Employees in <strong style="color:var(--text2)">low-CDI cities</strong> seek jobs at nearly 58% rate vs
-            under 11% in high-CDI cities. Location drives ambition.</p>
+          <p>Employees in <strong style="color:var(--ink2)">low-CDI cities</strong> seek jobs at nearly 58% rate vs under 11% in high-CDI cities. Location drives ambition.</p>
         </div>
         <div class="ftile">
           <div class="ftile-icon">🏢</div>
           <h3>Company Size Effect</h3>
-          <p>Small-company employees seek more. <strong style="color:var(--text2)">Limited growth, job
-              insecurity,</strong> and fewer internal mobility options push staff to look externally.</p>
+          <p>Small-company employees seek more. <strong style="color:var(--ink2)">Limited growth, job insecurity,</strong> and fewer internal mobility options push staff to look externally.</p>
         </div>
         <div class="ftile">
           <div class="ftile-icon">📚</div>
           <h3>Experience Sweet Spot</h3>
-          <p>Candidates with <strong style="color:var(--text2)">under 2 years' experience</strong> seek at 40–45% rate —
-            the classic "honeymoon–hangover" effect in action.</p>
+          <p>Candidates with <strong style="color:var(--ink2)">under 2 years' experience</strong> seek at 40–45% rate — the classic "honeymoon–hangover" effect in action.</p>
         </div>
       </div>
 
       <div class="pip-vis" id="pip-vis">
-        <div class="pv-step" id="pv1">
-          <div class="pv-num">01</div>
-          <div class="pv-label">Load Data</div>
-        </div>
-        <div class="pv-step" id="pv2">
-          <div class="pv-num">02</div>
-          <div class="pv-label">Explore</div>
-        </div>
-        <div class="pv-step" id="pv3">
-          <div class="pv-num">03</div>
-          <div class="pv-label">Preprocess</div>
-        </div>
-        <div class="pv-step" id="pv4">
-          <div class="pv-num">04</div>
-          <div class="pv-label">Train</div>
-        </div>
-        <div class="pv-step" id="pv5">
-          <div class="pv-num">05</div>
-          <div class="pv-label">Predict</div>
-        </div>
+        <div class="pv-step" id="pv1"><div class="pv-num">01</div><div class="pv-label">Load Data</div></div>
+        <div class="pv-step" id="pv2"><div class="pv-num">02</div><div class="pv-label">Explore</div></div>
+        <div class="pv-step" id="pv3"><div class="pv-num">03</div><div class="pv-label">Preprocess</div></div>
+        <div class="pv-step" id="pv4"><div class="pv-num">04</div><div class="pv-label">Train</div></div>
+        <div class="pv-step" id="pv5"><div class="pv-num">05</div><div class="pv-label">Predict</div></div>
       </div>
     </div>
 
-    <!-- ════════ DATA ════════ -->
-    <div class="content" id="sec-data">
+    <!-- ════ DATA ════ -->
+    <div class="section" id="sec-data">
+      <div class="page-header">
+        <div class="page-eyebrow">Step 1</div>
+        <h2 class="sec-title">Load Datasets</h2>
+        <div class="sec-sub">AUG_TRAIN.CSV + AUG_TEST.CSV · BUNDLED · READ-ONLY</div>
+      </div>
       <div id="data-alerts"></div>
-      <div class="card">
-        <div class="card-header">
+      <div class="panel accent-forest">
+        <div class="panel-header">
           <div>
-            <div class="card-title">Fixed Datasets</div>
-            <div class="card-sub">AUG_TRAIN.CSV + AUG_TEST.CSV · BUNDLED · READ-ONLY</div>
+            <div class="panel-title">Dataset Files</div>
+            <div class="panel-meta">Fixed datasets included with the application</div>
           </div>
           <button class="btn btn-primary" onclick="loadData()" id="load-btn">⚡ Load Datasets</button>
         </div>
         <div class="g2">
-          <div style="padding:16px;background:var(--panel2);border:1px solid var(--rim);border-radius:9px">
-            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
-              <span style="font-size:22px">🏋️</span>
+          <div style="padding:16px;background:var(--paper2);border:1px solid var(--rule)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <span style="font-size:20px">🏋️</span>
               <div>
-                <div class="card-title" style="font-size:0.9rem">Training Dataset</div>
-                <div class="card-sub">aug_train.csv · includes target</div>
+                <div class="panel-title" style="font-size:0.9rem">Training Dataset</div>
+                <div class="panel-meta">aug_train.csv · includes target</div>
               </div>
-              <span class="tag tag-g" id="trn-tag" style="margin-left:auto">—</span>
+              <span class="tag tag-f" id="trn-tag" style="margin-left:auto">—</span>
             </div>
             <div id="trn-info" class="text-muted">Click Load Datasets to read aug_train.csv</div>
           </div>
-          <div style="padding:16px;background:var(--panel2);border:1px solid var(--rim);border-radius:9px">
-            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
-              <span style="font-size:22px">🧪</span>
+          <div style="padding:16px;background:var(--paper2);border:1px solid var(--rule)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <span style="font-size:20px">🧪</span>
               <div>
-                <div class="card-title" style="font-size:0.9rem">Test Dataset</div>
-                <div class="card-sub">aug_test.csv · predictions only</div>
+                <div class="panel-title" style="font-size:0.9rem">Test Dataset</div>
+                <div class="panel-meta">aug_test.csv · predictions only</div>
               </div>
-              <span class="tag tag-b" id="tst-tag" style="margin-left:auto">—</span>
+              <span class="tag tag-l" id="tst-tag" style="margin-left:auto">—</span>
             </div>
             <div id="tst-info" class="text-muted">Click Load Datasets to read aug_test.csv</div>
           </div>
         </div>
       </div>
       <div id="data-profile" style="display:none">
-        <div class="card fade-in">
-          <div class="card-title mb-2">Overview</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2">Overview</div>
           <div class="g5" id="data-kpis"></div>
         </div>
         <div class="g2 fade-in">
-          <div class="card">
-            <div class="card-title mb-2">Missing Values</div>
+          <div class="panel">
+            <div class="panel-title mb-2">Missing Values</div>
             <div id="miss-list"></div>
           </div>
-          <div class="card">
-            <div class="card-title mb-2">Target Distribution</div>
+          <div class="panel">
+            <div class="panel-title mb-2">Target Distribution</div>
             <div id="tgt-dist"></div>
             <div id="cls-bal" class="mt-2"></div>
           </div>
         </div>
-        <div class="card fade-in">
-          <div class="card-title mb-2">Column Overview</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2">Column Overview</div>
           <div class="table-wrap" id="col-tbl"></div>
         </div>
-        <div style="text-align:right"><button class="btn btn-primary"
-            onclick="goTo('eda',document.querySelector('[data-s=eda]'))">Next: Explore →</button></div>
+        <div style="text-align:right">
+          <button class="btn btn-primary" onclick="goTo('eda',document.querySelector('[data-s=eda]'))">Next: Explore →</button>
+        </div>
       </div>
     </div>
 
-    <!-- ════════ EDA ════════ -->
-    <div class="content" id="sec-eda">
+    <!-- ════ EDA ════ -->
+    <div class="section" id="sec-eda">
+      <div class="page-header">
+        <div class="page-eyebrow">Step 2</div>
+        <h2 class="sec-title">Exploratory Data Analysis</h2>
+        <div class="sec-sub">10 INTERACTIVE PLOTLY CHARTS · HOVER FOR DETAILS</div>
+      </div>
       <div id="eda-alerts"></div>
-      <div class="card">
-        <div class="card-header">
+      <div class="panel accent-gold">
+        <div class="panel-header">
           <div>
-            <div class="card-title">Exploratory Data Analysis</div>
-            <div class="card-sub">10 INTERACTIVE PLOTLY CHARTS · HOVER FOR DETAILS</div>
+            <div class="panel-title">Generate Charts</div>
+            <div class="panel-meta">Analyse distributions, correlations, and target relationships</div>
           </div>
-          <button class="btn btn-primary" id="eda-btn" onclick="runEDA()">▶ Run EDA</button>
+          <button class="btn btn-gold" id="eda-btn" onclick="runEDA()">▶ Run EDA</button>
         </div>
       </div>
       <div id="eda-content" style="display:none">
-        <div class="card fade-in">
-          <div class="card-title mb-2" style="margin-bottom:14px">Key Statistics</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2" style="margin-bottom:14px">Key Statistics</div>
           <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px" id="eda-kpis"></div>
         </div>
-        <div class="card fade-in">
-          <div class="card-header">
-            <div class="card-title">Visualisations</div>
-          </div>
+        <div class="panel fade-in">
+          <div class="panel-header"><div class="panel-title">Visualisations</div></div>
           <div class="chart-tabs" id="eda-tabs"></div>
           <div id="eda-area" style="min-height:400px"></div>
         </div>
-        <div style="text-align:right"><button class="btn btn-primary"
-            onclick="goTo('prep',document.querySelector('[data-s=prep]'))">Next: Preprocess →</button></div>
+        <div style="text-align:right">
+          <button class="btn btn-primary" onclick="goTo('prep',document.querySelector('[data-s=prep]'))">Next: Preprocess →</button>
+        </div>
       </div>
     </div>
 
-    <!-- ════════ PREPROCESS ════════ -->
-    <div class="content" id="sec-prep">
+    <!-- ════ PREPROCESS ════ -->
+    <div class="section" id="sec-prep">
+      <div class="page-header">
+        <div class="page-eyebrow">Step 3</div>
+        <h2 class="sec-title">Feature Engineering & Preprocessing</h2>
+        <div class="sec-sub">FIT ON TRAIN ONLY · NO DATA LEAKAGE</div>
+      </div>
       <div id="prep-alerts"></div>
-      <div class="card">
-        <div class="card-header">
+      <div class="panel accent-slate">
+        <div class="panel-header">
           <div>
-            <div class="card-title">Feature Engineering & Preprocessing</div>
-            <div class="card-sub">FIT ON TRAIN ONLY · NO DATA LEAKAGE</div>
+            <div class="panel-title">Preprocessing Pipeline</div>
+            <div class="panel-meta">Imputation · encoding · scaling · feature creation</div>
           </div>
-          <button class="btn btn-violet" id="prep-btn" onclick="runPrep()">▶ Run Preprocessing</button>
+          <button class="btn btn-primary" style="background:var(--slate)" id="prep-btn" onclick="runPrep()">▶ Run Preprocessing</button>
         </div>
         <div class="g3">
-          <div class="ftile">
-            <div class="ftile-icon">🔧</div>
-            <h3>Tiered Imputation</h3>
-            <p>≥30% missing → "Unknown" · ≥10% → "Unknown" · &lt;10% → mode or median. All values fitted on train only.
-            </p>
-          </div>
-          <div class="ftile">
-            <div class="ftile-icon">🔢</div>
-            <h3>Ordinal Encoding</h3>
-            <p>experience, company_size, last_new_job get proper ordinal numeric mappings — no fake label ordering.</p>
-          </div>
-          <div class="ftile">
-            <div class="ftile-icon">✨</div>
-            <h3>5 New Features</h3>
-            <p>cdi_x_rel_exp · is_enrolled · high_cdi · has_rel_exp · training_bucket — domain-driven engineering.</p>
-          </div>
-          <div class="ftile">
-            <div class="ftile-icon">📏</div>
-            <h3>Standard Scaling</h3>
-            <p>Scaler fitted on train split only. Applied separately to val/test — prevents information leakage.</p>
-          </div>
-          <div class="ftile">
-            <div class="ftile-icon">⚖️</div>
-            <h3>Class Weighting</h3>
-            <p>25% positive class handled with class_weight='balanced' in all 5 models.</p>
-          </div>
-          <div class="ftile">
-            <div class="ftile-icon">🚫</div>
-            <h3>Zero Leakage</h3>
-            <p>All fill values, encoders, and scaler fitted on train only. Test data only ever transformed, never used
-              to fit.</p>
-          </div>
+          <div class="ftile"><div class="ftile-icon">🔧</div><h3>Tiered Imputation</h3><p>≥30% missing → "Unknown" · ≥10% → "Unknown" · &lt;10% → mode or median. All values fitted on train only.</p></div>
+          <div class="ftile"><div class="ftile-icon">🔢</div><h3>Ordinal Encoding</h3><p>experience, company_size, last_new_job get proper ordinal numeric mappings — no fake label ordering.</p></div>
+          <div class="ftile"><div class="ftile-icon">✨</div><h3>5 New Features</h3><p>cdi_x_rel_exp · is_enrolled · high_cdi · has_rel_exp · training_bucket — domain-driven engineering.</p></div>
+          <div class="ftile"><div class="ftile-icon">📏</div><h3>Standard Scaling</h3><p>Scaler fitted on train split only. Applied separately to val/test — prevents information leakage.</p></div>
+          <div class="ftile"><div class="ftile-icon">⚖️</div><h3>Class Weighting</h3><p>25% positive class handled with class_weight='balanced' in all 5 models.</p></div>
+          <div class="ftile"><div class="ftile-icon">🚫</div><h3>Zero Leakage</h3><p>All fill values, encoders, and scaler fitted on train only. Test data only ever transformed, never used to fit.</p></div>
         </div>
       </div>
       <div id="prep-results" style="display:none">
-        <div class="card fade-in">
-          <div class="card-title mb-2">Summary</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2">Summary</div>
           <div class="g4" id="prep-kpis"></div>
         </div>
         <div class="g2 fade-in">
-          <div class="card">
-            <div class="card-title mb-2">Feature List</div>
+          <div class="panel">
+            <div class="panel-title mb-2">Feature List</div>
             <div id="feat-list"></div>
           </div>
-          <div class="card">
-            <div class="card-title mb-2">Imputation Strategy</div>
+          <div class="panel">
+            <div class="panel-title mb-2">Imputation Strategy</div>
             <div id="fill-strat"></div>
           </div>
         </div>
-        <div class="card fade-in">
-          <div class="card-title mb-2">Feature Distributions & Outliers</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2">Feature Distributions & Outliers</div>
           <div id="prep-charts"></div>
         </div>
-        <div style="text-align:right"><button class="btn btn-primary"
-            onclick="goTo('train',document.querySelector('[data-s=train]'))">Next: Train Models →</button></div>
+        <div style="text-align:right">
+          <button class="btn btn-primary" onclick="goTo('train',document.querySelector('[data-s=train]'))">Next: Train Models →</button>
+        </div>
       </div>
     </div>
 
-    <!-- ════════ TRAIN ════════ -->
-    <div class="content" id="sec-train">
+    <!-- ════ TRAIN ════ -->
+    <div class="section" id="sec-train">
+      <div class="page-header">
+        <div class="page-eyebrow">Step 4</div>
+        <h2 class="sec-title">Model Training & Evaluation <span class="val-badge">✅ Validation Set</span></h2>
+        <div class="sec-sub">80/20 STRATIFIED SPLIT · 5-FOLD CV · THRESHOLD TUNING · OVERFIT DETECTION</div>
+      </div>
       <div id="train-alerts"></div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Model Training & Evaluation <span class="val-badge">✅ Validation Set</span></div>
-            <div class="card-sub">80/20 STRATIFIED SPLIT · 5-FOLD CV · THRESHOLD TUNING · OVERFIT DETECTION</div>
-          </div>
-          <button class="btn btn-emerald" id="train-btn" onclick="trainModels()">▶ Train All Models</button>
+      <div class="panel accent-sage">
+        <div class="panel-header">
+          <div><div class="panel-title">Train Five Models</div><div class="panel-meta">Logistic Regression · Decision Tree · Random Forest · SVM · KNN</div></div>
+          <button class="btn btn-primary" style="background:var(--sage)" id="train-btn" onclick="trainModels()">▶ Train All Models</button>
         </div>
-        <div class="model-grid" id="model-grid">
-          <div class="mcard" id="mc-lr">
-            <div class="mcard-name">Logistic Reg</div>
-            <div class="mcard-auc">—</div>
-            <div class="mcard-f1">—</div>
-            <div class="mcard-label">AUC · F1 (val)</div>
-          </div>
-          <div class="mcard" id="mc-dt">
-            <div class="mcard-name">Decision Tree</div>
-            <div class="mcard-auc">—</div>
-            <div class="mcard-f1">—</div>
-            <div class="mcard-label">AUC · F1 (val)</div>
-          </div>
-          <div class="mcard" id="mc-rf">
-            <div class="mcard-name">Random Forest</div>
-            <div class="mcard-auc">—</div>
-            <div class="mcard-f1">—</div>
-            <div class="mcard-label">AUC · F1 (val)</div>
-          </div>
-          <div class="mcard" id="mc-svm">
-            <div class="mcard-name">SVM</div>
-            <div class="mcard-auc">—</div>
-            <div class="mcard-f1">—</div>
-            <div class="mcard-label">AUC · F1 (val)</div>
-          </div>
-          <div class="mcard" id="mc-knn">
-            <div class="mcard-name">KNN</div>
-            <div class="mcard-auc">—</div>
-            <div class="mcard-f1">—</div>
-            <div class="mcard-label">AUC · F1 (val)</div>
-          </div>
+        <div class="model-row" id="model-grid">
+          <div class="mcard" id="mc-lr"><div class="mcard-name">Logistic Reg</div><div class="mcard-auc">—</div><div class="mcard-f1">—</div><div class="mcard-label">AUC · F1 (val)</div></div>
+          <div class="mcard" id="mc-dt"><div class="mcard-name">Decision Tree</div><div class="mcard-auc">—</div><div class="mcard-f1">—</div><div class="mcard-label">AUC · F1 (val)</div></div>
+          <div class="mcard" id="mc-rf"><div class="mcard-name">Random Forest</div><div class="mcard-auc">—</div><div class="mcard-f1">—</div><div class="mcard-label">AUC · F1 (val)</div></div>
+          <div class="mcard" id="mc-svm"><div class="mcard-name">SVM</div><div class="mcard-auc">—</div><div class="mcard-f1">—</div><div class="mcard-label">AUC · F1 (val)</div></div>
+          <div class="mcard" id="mc-knn"><div class="mcard-name">KNN</div><div class="mcard-auc">—</div><div class="mcard-f1">—</div><div class="mcard-label">AUC · F1 (val)</div></div>
         </div>
       </div>
       <div id="train-results" style="display:none">
-        <div class="card fade-in">
-          <div class="card-header">
-            <div class="card-title">Validation Metrics</div><span class="val-badge">20% held-out set — never seen during
-              training</span>
+        <div class="panel fade-in">
+          <div class="panel-header">
+            <div class="panel-title">Validation Metrics</div>
+            <span class="val-badge">20% held-out set — never seen during training</span>
           </div>
           <div class="table-wrap" id="metrics-tbl"></div>
         </div>
-        <div class="card fade-in">
-          <div class="card-title mb-2" style="margin-bottom:14px">Interactive Charts</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2" style="margin-bottom:14px">Interactive Charts</div>
           <div class="chart-tabs" id="chart-tabs"></div>
           <div id="chart-area" style="min-height:420px"></div>
         </div>
-        <div class="card fade-in">
-          <div class="card-title mb-2" style="margin-bottom:14px">Quick Insights</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2" style="margin-bottom:14px">Quick Insights</div>
           <div id="quick-insights" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>
         </div>
         <div style="text-align:right;display:flex;gap:10px;justify-content:flex-end">
-          <button class="btn btn-ghost" onclick="goTo('insights',document.querySelector('[data-s=insights]'))">View
-            Research →</button>
-          <button class="btn btn-ghost"
-            onclick="goTo('interp',document.querySelector('[data-s=interp]'))">Interpretability →</button>
-          <button class="btn btn-primary" onclick="goTo('pred',document.querySelector('[data-s=pred]'))">Next: Predict
-            →</button>
+          <button class="btn btn-ghost" onclick="goTo('insights',document.querySelector('[data-s=insights]'))">View Research →</button>
+          <button class="btn btn-ghost" onclick="goTo('interp',document.querySelector('[data-s=interp]'))">Interpretability →</button>
+          <button class="btn btn-primary" onclick="goTo('pred',document.querySelector('[data-s=pred]'))">Next: Predict →</button>
         </div>
       </div>
     </div>
 
-    <!-- ════════ KEY INSIGHTS ════════ -->
-    <div class="content" id="sec-insights">
+    <!-- ════ KEY INSIGHTS ════ -->
+    <div class="section" id="sec-insights">
+      <div class="page-header">
+        <div class="page-eyebrow">Analysis · Research-Backed</div>
+        <h2 class="sec-title">Key Findings</h2>
+        <div class="sec-sub">EIGHT INSIGHTS GROUNDED IN PUBLISHED RESEARCH AND DATASET PATTERNS</div>
+      </div>
+
       <div class="insight-banner">
         <div class="insight-banner-title">📌 Research-Backed Key Insights</div>
-        <div class="insight-banner-sub">Each finding is grounded in published research and validated by patterns in the
-          dataset. These observations explain <em>why</em> the model works — connecting data science to HR psychology
-          and organisational behaviour.</div>
+        <div class="insight-banner-sub">Each finding is grounded in published research and validated by patterns in the dataset. These observations explain <em>why</em> the model works — connecting data science to HR psychology and organisational behaviour.</div>
       </div>
 
       <!-- INSIGHT 1 -->
@@ -1945,18 +1429,12 @@
           <div>
             <div class="insight-title">Experience vs Job Switching — The Honeymoon–Hangover Effect</div>
             <div class="insight-finding">
-              <strong>Job satisfaction peaks right after a job change but declines over time</strong>, causing employees
-              with &lt;2 years of experience to show the highest switching rate (40–45%). In our data, "&lt;1 year"
-              candidates seek at <strong>45.4%</strong> — nearly twice the dataset average.
-              <br>
-              <a class="insight-ref" href="https://en.wikipedia.org/wiki/Honeymoon-hangover_effect" target="_blank">↗
-                Honeymoon–Hangover Effect (Wikipedia)</a>
+              <strong>Job satisfaction peaks right after a job change but declines over time</strong>, causing employees with &lt;2 years of experience to show the highest switching rate (40–45%). In our data, "&lt;1 year" candidates seek at <strong>45.4%</strong> — nearly twice the dataset average.
+              <br><a class="insight-ref" href="https://en.wikipedia.org/wiki/Honeymoon-hangover_effect" target="_blank">↗ Honeymoon–Hangover Effect (Wikipedia)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-exp" style="min-height:360px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-exp" style="min-height:360px"></div></div>
       </div>
 
       <!-- INSIGHT 2 -->
@@ -1966,20 +1444,12 @@
           <div>
             <div class="insight-title">Training & Attrition — Skill Development Increases Mobility</div>
             <div class="insight-finding">
-              <strong>Training enhances employee skills and raises their external job market value</strong>, which can
-              increase switching intentions — especially for those with heavy training investment. In the dataset,
-              high-training-hour candidates (200+) show <strong>slightly lower</strong> seek rates (20.1%), suggesting
-              that very invested employees may stay — but the relationship is nuanced.
-              <br>
-              <a class="insight-ref"
-                href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace"
-                target="_blank">↗ Employee Attrition: Causes & Consequences (ResearchGate)</a>
+              <strong>Training enhances employee skills and raises their external job market value</strong>, which can increase switching intentions — especially for those with heavy training investment. In the dataset, high-training-hour candidates (200+) show <strong>slightly lower</strong> seek rates (20.1%), suggesting that very invested employees may stay — but the relationship is nuanced.
+              <br><a class="insight-ref" href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace" target="_blank">↗ Employee Attrition: Causes & Consequences (ResearchGate)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-training" style="min-height:340px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-training" style="min-height:340px"></div></div>
       </div>
 
       <!-- INSIGHT 3 -->
@@ -1989,20 +1459,12 @@
           <div>
             <div class="insight-title">Company Size Effect — Small Firms Lose More Talent</div>
             <div class="insight-finding">
-              <strong>Smaller organisations experience higher employee turnover</strong> due to limited growth
-              opportunities and job security concerns. The dataset shows employees in large firms (10,000+) seek at
-              <strong>19.1%</strong> while the pattern aligns with research showing stability at scale — though the
-              relationship is non-linear.
-              <br>
-              <a class="insight-ref"
-                href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace"
-                target="_blank">↗ Employee Attrition Studies (ResearchGate)</a>
+              <strong>Smaller organisations experience higher employee turnover</strong> due to limited growth opportunities and job security concerns. The dataset shows employees in large firms (10,000+) seek at <strong>19.1%</strong> while the pattern aligns with research showing stability at scale — though the relationship is non-linear.
+              <br><a class="insight-ref" href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace" target="_blank">↗ Employee Attrition Studies (ResearchGate)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-cosize" style="min-height:340px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-cosize" style="min-height:340px"></div></div>
       </div>
 
       <!-- INSIGHT 4 -->
@@ -2012,19 +1474,12 @@
           <div>
             <div class="insight-title">Education Impact — Higher Qualifications, More Options</div>
             <div class="insight-finding">
-              <strong>Employees with higher educational qualifications have more employment options and
-                mobility.</strong> Graduates seek at <strong>28.0%</strong> — the highest of any education level — while
-              PhDs seek at only 14%, suggesting specialisation creates retention. This validates the "educated options"
-              hypothesis.
-              <br>
-              <a class="insight-ref" href="https://ijrpr.com/uploads/V6ISSUE7/IJRPR50497.pdf" target="_blank">↗ Employee
-                Attrition Analysis (IJRPR)</a>
+              <strong>Employees with higher educational qualifications have more employment options and mobility.</strong> Graduates seek at <strong>28.0%</strong> — the highest of any education level — while PhDs seek at only 14%, suggesting specialisation creates retention.
+              <br><a class="insight-ref" href="https://ijrpr.com/uploads/V6ISSUE7/IJRPR50497.pdf" target="_blank">↗ Employee Attrition Analysis (IJRPR)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-edu" style="min-height:340px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-edu" style="min-height:340px"></div></div>
       </div>
 
       <!-- INSIGHT 5 -->
@@ -2034,20 +1489,12 @@
           <div>
             <div class="insight-title">Location & CDI — Workers Seek Better Economic Environments</div>
             <div class="insight-finding">
-              <strong>Workers increasingly move toward regions offering better economic opportunities.</strong> The City
-              Development Index is the #1 feature in this model. Employees in cities with CDI &lt;0.65 seek at
-              <strong>58–59%</strong> — six times the rate of high-CDI cities (&lt;11%). Economic environment is the
-              strongest single predictor.
-              <br>
-              <a class="insight-ref"
-                href="https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/the-great-attrition-is-making-hiring-harder-are-you-searching-the-right-talent-pools"
-                target="_blank">↗ McKinsey — The Great Attrition Report</a>
+              <strong>Workers increasingly move toward regions offering better economic opportunities.</strong> The City Development Index is the #1 feature in this model. Employees in cities with CDI &lt;0.65 seek at <strong>58–59%</strong> — six times the rate of high-CDI cities (&lt;11%).
+              <br><a class="insight-ref" href="https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/the-great-attrition-is-making-hiring-harder-are-you-searching-the-right-talent-pools" target="_blank">↗ McKinsey — The Great Attrition Report</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-cdi" style="min-height:340px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-cdi" style="min-height:340px"></div></div>
       </div>
 
       <!-- INSIGHT 6 -->
@@ -2057,19 +1504,12 @@
           <div>
             <div class="insight-title">Skill Development — Active Learners Seek Better Roles</div>
             <div class="insight-finding">
-              <strong>Employees who actively invest in skill development are more likely to seek improved
-                opportunities.</strong> University enrollment correlates with higher seek rates — full-time enrolled
-              candidates (~32%) vs not enrolled (~22%). Self-investment signals external ambition.
-              <br>
-              <a class="insight-ref"
-                href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace"
-                target="_blank">↗ Attrition Behaviour Studies (ResearchGate)</a>
+              <strong>Employees who actively invest in skill development are more likely to seek improved opportunities.</strong> University enrollment correlates with higher seek rates — full-time enrolled candidates (~32%) vs not enrolled (~22%).
+              <br><a class="insight-ref" href="https://www.researchgate.net/publication/374813270_A_Study_on_Understanding_Employee_Attrition-Causes_and_Consequences_in_the_Workplace" target="_blank">↗ Attrition Behaviour Studies (ResearchGate)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-enroll" style="min-height:320px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-enroll" style="min-height:320px"></div></div>
       </div>
 
       <!-- INSIGHT 7 -->
@@ -2079,18 +1519,12 @@
           <div>
             <div class="insight-title">Gender Impact — Weak Determinant of Job Switching</div>
             <div class="insight-finding">
-              <strong>Job-switching behaviour is not strongly determined by gender</strong>, though outcomes differ
-              slightly. Female candidates seek at 26.3%, male at 22.8%, and "Other" at 26.2% — differences exist but are
-              modest. Gender ranks among the <em>lowest</em> feature importances in our models.
-              <br>
-              <a class="insight-ref" href="https://arxiv.org/abs/2505.09791" target="_blank">↗ Gender Pay & Mobility
-                Study (arXiv)</a>
+              <strong>Job-switching behaviour is not strongly determined by gender</strong>, though outcomes differ slightly. Female candidates seek at 26.3%, male at 22.8%, and "Other" at 26.2%. Gender ranks among the <em>lowest</em> feature importances in our models.
+              <br><a class="insight-ref" href="https://arxiv.org/abs/2505.09791" target="_blank">↗ Gender Pay & Mobility Study (arXiv)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-gender" style="min-height:300px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-gender" style="min-height:300px"></div></div>
       </div>
 
       <!-- INSIGHT 8 -->
@@ -2100,56 +1534,46 @@
           <div>
             <div class="insight-title">Class Imbalance — The Core ML Challenge</div>
             <div class="insight-finding">
-              <strong>Attrition datasets typically exhibit class imbalance</strong> — fewer employees leave than stay.
-              At 24.9% positive rate, a naive model predicting "stay" always would achieve 75% accuracy but zero
-              utility. We address this with <strong>class_weight='balanced'</strong> and threshold tuning, making
-              F1-score and ROC-AUC the relevant metrics — not accuracy.
-              <br>
-              <a class="insight-ref" href="https://arxiv.org/abs/2502.17865" target="_blank">↗ ML Attrition Studies
-                (arXiv)</a>
+              <strong>Attrition datasets typically exhibit class imbalance</strong> — fewer employees leave than stay. At 24.9% positive rate, a naive model predicting "stay" always would achieve 75% accuracy but zero utility. We address this with <strong>class_weight='balanced'</strong> and threshold tuning.
+              <br><a class="insight-ref" href="https://arxiv.org/abs/2502.17865" target="_blank">↗ ML Attrition Studies (arXiv)</a>
             </div>
           </div>
         </div>
-        <div class="insight-body">
-          <div id="chart-imbalance" style="min-height:300px"></div>
-        </div>
+        <div class="insight-body"><div id="chart-imbalance" style="min-height:300px"></div></div>
       </div>
 
-      <!-- Conclusion -->
       <div class="insight-conclusion">
-        <div class="insight-conclusion-title">🧠 Research Conclusion</div>
-        <p>These eight findings collectively validate that <strong>City Development Index, years of experience, company
-            size and type, and active skill investment</strong> are the primary drivers of employee attrition — aligning
-          both with the ML model's feature importances and published HR research. The dataset's patterns are not
-          statistical noise — they reflect real organisational psychology documented across multiple academic and
-          industry sources.</p>
+        <div class="insight-conclusion-title">Research Conclusion</div>
+        <p>These eight findings collectively validate that <strong>City Development Index, years of experience, company size and type, and active skill investment</strong> are the primary drivers of employee attrition — aligning both with the ML model's feature importances and published HR research.</p>
       </div>
     </div>
 
-    <!-- ════════ INTERPRETABILITY ════════ -->
-    <div class="content" id="sec-interp">
-      <div class="card">
-        <div class="card-title mb-2">Why Does the Model Predict Job-Seeking?</div>
-        <div class="card-sub" style="margin-bottom:14px">FEATURE IMPORTANCE · LR COEFFICIENTS · PERMUTATION IMPORTANCE ·
-          DECISION RULES</div>
-        <p class="text-muted">Three complementary methods — Random Forest impurity-based importance, Logistic Regression
-          coefficients (directional), and permutation importance on the validation set — give a robust picture of which
-          features drive predictions.</p>
+    <!-- ════ INTERPRETABILITY ════ -->
+    <div class="section" id="sec-interp">
+      <div class="page-header">
+        <div class="page-eyebrow">Analysis · Model Explanations</div>
+        <h2 class="sec-title">Why Does the Model Predict Job-Seeking?</h2>
+        <div class="sec-sub">FEATURE IMPORTANCE · LR COEFFICIENTS · PERMUTATION IMPORTANCE · DECISION RULES</div>
       </div>
-      <div id="interp-content">
+      <div class="panel text-muted" style="margin-bottom:0">
+        Three complementary methods — Random Forest impurity-based importance, Logistic Regression coefficients (directional), and permutation importance on the validation set — give a robust picture of which features drive predictions.
+      </div>
+      <div id="interp-content" style="margin-top:20px">
         <div class="alert alert-info">ℹ Train models first (Step 4) to see interpretability analysis.</div>
       </div>
     </div>
 
-    <!-- ════════ PREDICT ════════ -->
-    <div class="content" id="sec-pred">
+    <!-- ════ PREDICT ════ -->
+    <div class="section" id="sec-pred">
+      <div class="page-header">
+        <div class="page-eyebrow">Step 5</div>
+        <h2 class="sec-title">Generate Predictions</h2>
+        <div class="sec-sub">INFERENCE ON AUG_TEST.CSV → SUBMISSION.CSV</div>
+      </div>
       <div id="pred-alerts"></div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Generate Predictions</div>
-            <div class="card-sub">INFERENCE ON AUG_TEST.CSV → SUBMISSION.CSV</div>
-          </div>
+      <div class="panel accent-sienna">
+        <div class="panel-header">
+          <div><div class="panel-title">Run Inference</div><div class="panel-meta">Select a trained model and generate submission file</div></div>
         </div>
         <div style="display:flex;align-items:flex-end;gap:14px">
           <div>
@@ -2167,25 +1591,21 @@
         </div>
       </div>
       <div id="pred-results" style="display:none">
-        <div class="card fade-in">
-          <div class="card-title mb-2">Summary</div>
+        <div class="panel fade-in">
+          <div class="panel-title mb-2">Summary</div>
           <div class="g5" id="pred-kpis"></div>
         </div>
-        <div class="card fade-in">
-          <div class="card-header">
-            <div class="card-title">Submission Preview</div><button class="btn btn-emerald btn-sm" onclick="dlSub()">⬇
-              Download submission.csv</button>
+        <div class="panel fade-in">
+          <div class="panel-header">
+            <div class="panel-title">Submission Preview</div>
+            <button class="btn btn-primary btn-sm" onclick="dlSub()">⬇ Download submission.csv</button>
           </div>
           <div class="table-wrap" id="sub-preview"></div>
         </div>
-        <div class="card fade-in"
-          style="background:linear-gradient(135deg,rgba(59,130,246,.07),rgba(124,58,237,.07));border-color:rgba(59,130,246,.25)">
-          <div style="text-align:center;padding:16px 0">
-            <div style="font-size:30px;margin-bottom:10px">🎉</div>
-            <div style="font-family:var(--fhead);font-size:1.2rem;font-weight:800;margin-bottom:6px">Pipeline Complete
-            </div>
-            <p class="text-muted">submission.csv is ready. Download and submit to the competition.</p>
-          </div>
+        <div class="panel fade-in" style="background:rgba(45,80,22,.07);border-left:4px solid var(--forest);text-align:center;padding:32px">
+          <div style="font-size:28px;margin-bottom:10px">🎉</div>
+          <div style="font-family:var(--fdisp);font-size:1.3rem;margin-bottom:6px">Pipeline Complete</div>
+          <p class="text-muted">submission.csv is ready. Download and submit to the competition.</p>
         </div>
       </div>
     </div>
@@ -2193,67 +1613,72 @@
   </div><!-- /main -->
 
   <script>
-    // ─── Plotly config ────────────────────────────────────────────────────────────
-    const PCFG = { responsive: true, displayModeBar: true, modeBarButtonsToRemove: ['sendDataToCloud', 'autoScale2d'], displaylogo: false };
-    const PLOT = (id, spec) => { if (!spec?.data) { document.getElementById(id).innerHTML = '<div class="text-muted" style="padding:20px">Chart unavailable</div>'; return; } Plotly.newPlot(id, spec.data, spec.layout, PCFG); };
+    // ─── Plotly config ─────────────────────────────────────────────────────────
+    const PAPER = '#F5F1EB', PAPER2 = '#EDE8DF', RIM = '#C8BFB0', INK = '#1A1714', MUT = '#6B6157';
+    const FOREST = '#2D5016', SIENNA = '#A0402A', GOLD = '#8B6914', SLATE = '#2A3F5A', SAGE = '#4A7050';
 
-    // ─── Titles ───────────────────────────────────────────────────────────────────
+    const PCFG = { responsive: true, displayModeBar: true, modeBarButtonsToRemove: ['sendDataToCloud','autoScale2d'], displaylogo: false };
+    const PLOT = (id, spec) => {
+      if (!spec?.data) { document.getElementById(id).innerHTML = '<div class="text-muted" style="padding:20px">Chart unavailable</div>'; return; }
+      Plotly.newPlot(id, spec.data, spec.layout, PCFG);
+    };
+
     const TITLES = {
-      home: ['Dashboard', 'HR JOB-CHANGE PREDICTION'], data: ['Load Data', 'AUG_TRAIN + AUG_TEST'],
+      home: ['Overview', 'HR JOB-CHANGE PREDICTION'], data: ['Load Data', 'AUG_TRAIN + AUG_TEST'],
       eda: ['Explore (EDA)', 'EXPLORATORY DATA ANALYSIS'], prep: ['Preprocess', 'FEATURE ENGINEERING'],
       train: ['Train Models', '80/20 SPLIT · VALIDATION METRICS'], insights: ['Key Insights', 'RESEARCH-BACKED FINDINGS'],
       interp: ['Interpretability', 'WHY THE MODEL PREDICTS WHAT IT PREDICTS'], pred: ['Predict', 'INFERENCE → SUBMISSION.CSV']
     };
 
-    // ─── Navigation ───────────────────────────────────────────────────────────────
+    // ─── Navigation ────────────────────────────────────────────────────────────
     function goTo(s, el) {
-      document.querySelectorAll('.content').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
       document.getElementById('sec-' + s).classList.add('active');
       if (el) el.classList.add('active');
-      const [t, c] = TITLES[s] || ['', ''];
-      document.getElementById('pg-title').textContent = t;
-      document.getElementById('pg-crumb').textContent = c;
-      // Resize plotly charts in new section
       setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
     }
 
-    // ─── Loader ───────────────────────────────────────────────────────────────────
-    function showLdr(m = 'Processing', s = 'please wait…') { document.getElementById('ldr-txt').textContent = m; document.getElementById('ldr-sub').textContent = s; document.getElementById('loader').classList.add('show'); }
+    // ─── Loader ────────────────────────────────────────────────────────────────
+    function showLdr(m = 'Processing', s = 'please wait…') {
+      document.getElementById('ldr-txt').textContent = m;
+      document.getElementById('ldr-sub').textContent = s;
+      document.getElementById('loader').classList.add('show');
+    }
     function hideLdr() { document.getElementById('loader').classList.remove('show'); }
 
-    // ─── Alert ────────────────────────────────────────────────────────────────────
+    // ─── Alert ─────────────────────────────────────────────────────────────────
     function showAlert(id, msg, t = 'ok') {
       const icons = { ok: '✓', err: '✕', info: 'ℹ', warn: '⚠' };
       document.getElementById(id).innerHTML = `<div class="alert alert-${t} fade-in">${icons[t] || '•'} ${msg}</div>`;
     }
 
-    // ─── Pipeline dots ────────────────────────────────────────────────────────────
+    // ─── Pipeline dots ─────────────────────────────────────────────────────────
     let pState = {};
     function refreshDots(steps) {
       pState = steps;
-      const ks = ['data_loaded', 'eda_done', 'preprocessing_done', 'training_done', 'prediction_done'];
+      const ks = ['data_loaded','eda_done','preprocessing_done','training_done','prediction_done'];
       let done = 0;
       ks.forEach((k, i) => {
-        const seg = document.getElementById('ps' + (i + 1));
-        const vis = document.getElementById('pv' + (i + 1));
-        if (steps[k]) { done++; if (seg) seg.className = 'pip-seg done'; if (vis) vis.className = 'pv-step done'; }
-        else { if (seg) seg.className = 'pip-seg'; if (vis) vis.className = 'pv-step'; }
+        const seg = document.getElementById('ps' + (i+1));
+        const vis = document.getElementById('pv' + (i+1));
+        if (steps[k]) { done++; if(seg) seg.className='prog-seg done'; if(vis) vis.className='pv-step done'; }
+        else { if(seg) seg.className='prog-seg'; if(vis) vis.className='pv-step'; }
       });
       document.getElementById('pip-pct').textContent = done + ' / 5 complete';
-      const nm = { data_loaded: 'data', eda_done: 'eda', preprocessing_done: 'prep', training_done: 'train', prediction_done: 'pred' };
-      for (const [k, s] of Object.entries(nm)) {
-        if (steps[k]) { const el = document.querySelector(`[data-s=${s}]`); if (el && !el.classList.contains('active')) el.classList.add('done'); }
+      const nm = { data_loaded:'data', eda_done:'eda', preprocessing_done:'prep', training_done:'train', prediction_done:'pred' };
+      for (const [k,s] of Object.entries(nm)) {
+        if (steps[k]) { const el = document.querySelector(`[data-s=${s}]`); if(el && !el.classList.contains('active')) el.classList.add('done'); }
       }
     }
-    async function refreshStatus() { try { refreshDots(await (await fetch('/api/status')).json()); } catch (e) { } }
+    async function refreshStatus() { try { refreshDots(await (await fetch('/api/status')).json()); } catch(e){} }
 
-    // ─── Load Data ────────────────────────────────────────────────────────────────
+    // ─── Load Data ─────────────────────────────────────────────────────────────
     async function loadData() {
       showLdr('Loading datasets', 'reading aug_train.csv & aug_test.csv…');
       document.getElementById('load-btn').disabled = true;
       try {
-        const d = await (await fetch('/api/load-data', { method: 'POST' })).json();
+        const d = await (await fetch('/api/load-data', { method:'POST' })).json();
         if (d.success) {
           renderProfile(d.train);
           showAlert('data-alerts', d.message, 'ok');
@@ -2263,384 +1688,366 @@
           document.getElementById('tst-info').textContent = d.test.rows.toLocaleString() + ' rows · ' + d.test.cols + ' cols';
           refreshStatus();
         } else showAlert('data-alerts', d.error, 'err');
-      } catch (e) { showAlert('data-alerts', e.message, 'err'); }
+      } catch(e) { showAlert('data-alerts', e.message, 'err'); }
       document.getElementById('load-btn').disabled = false;
       hideLdr();
     }
+
     function renderProfile(train) {
       document.getElementById('data-profile').style.display = 'block';
-      document.getElementById('data-kpis').innerHTML = `
-    <div class="kpi b"><div class="kpi-label">Rows</div><div class="kpi-value">${train.rows.toLocaleString()}</div></div>
-    <div class="kpi p"><div class="kpi-label">Columns</div><div class="kpi-value">${train.cols}</div></div>
-    <div class="kpi g"><div class="kpi-label">Miss Cols</div><div class="kpi-value">${Object.keys(train.missing || {}).length}</div></div>
-    <div class="kpi a"><div class="kpi-label">Duplicates</div><div class="kpi-value">${train.duplicates || 0}</div></div>
-    <div class="kpi c"><div class="kpi-label">Miss Cells</div><div class="kpi-value">${Object.values(train.missing || {}).reduce((a, b) => a + b, 0).toLocaleString()}</div></div>`;
+      const colors = ['t-forest','t-sienna','t-gold','t-slate','t-sage'];
+      const vals = [
+        ['Rows', train.rows.toLocaleString()],
+        ['Columns', train.cols],
+        ['Miss Cols', Object.keys(train.missing||{}).length],
+        ['Duplicates', train.duplicates||0],
+        ['Miss Cells', Object.values(train.missing||{}).reduce((a,b)=>a+b,0).toLocaleString()]
+      ];
+      document.getElementById('data-kpis').innerHTML = vals.map((v,i)=>`<div class="stat-tile ${colors[i]}"><div class="stat-label">${v[0]}</div><div class="stat-value">${v[1]}</div></div>`).join('');
+
       const miss = train.missing_pct || {};
-      let mh = Object.keys(miss).length === 0 ? '<div class="alert alert-ok">✓ No missing values</div>' : '';
-      for (const [col, pct] of Object.entries(miss)) { const c = pct > 30 ? 'var(--rose)' : pct > 10 ? 'var(--amber)' : 'var(--accent)'; mh += `<div class="miss-row"><div class="miss-name">${col}</div><div class="miss-bar"><div class="miss-fill" style="width:${pct}%;background:${c}"></div></div><div class="miss-pct" style="color:${c}">${pct}%</div></div>`; }
+      let mh = Object.keys(miss).length===0 ? '<div class="alert alert-ok">✓ No missing values</div>' : '';
+      for (const [col, pct] of Object.entries(miss)) {
+        const c = pct>30 ? SIENNA : pct>10 ? GOLD : FOREST;
+        mh += `<div class="miss-row"><div class="miss-name">${col}</div><div class="miss-bar"><div class="miss-fill" style="width:${pct}%;background:${c}"></div></div><div class="miss-pct" style="color:${c}">${pct}%</div></div>`;
+      }
       document.getElementById('miss-list').innerHTML = mh;
-      const td = train.target_dist || {}; const tot = Object.values(td).reduce((a, b) => a + b, 0);
-      const tcol = { '0': 'var(--accent)', '1': '#a78bfa' }; const tlbl = { '0': 'Staying (0)', '1': 'Job Seeking (1)' };
-      let dh = '';
-      for (const [k, v] of Object.entries(td)) { const pct = tot ? (v / tot * 100).toFixed(1) : 0; dh += `<div class="mbar-row"><div class="mbar-label" style="color:${tcol[k] || 'var(--text)'}">${tlbl[k] || k}</div><div class="mbar-track"><div class="mbar-fill" style="width:${pct}%;background:${tcol[k] || 'var(--accent)'}"></div></div><div class="mbar-val">${(+v).toLocaleString()}</div></div>`; }
+
+      const td = train.target_dist||{}; const tot = Object.values(td).reduce((a,b)=>a+b,0);
+      const tcol={'0':FOREST,'1':SIENNA}; const tlbl={'0':'Staying (0)','1':'Job Seeking (1)'};
+      let dh='';
+      for (const [k,v] of Object.entries(td)) { const pct=tot?(v/tot*100).toFixed(1):0; dh+=`<div class="mbar-row"><div class="mbar-label" style="color:${tcol[k]||FOREST}">${tlbl[k]||k}</div><div class="mbar-track"><div class="mbar-fill" style="width:${pct}%;background:${tcol[k]||FOREST}"></div></div><div class="mbar-val">${(+v).toLocaleString()}</div></div>`; }
       document.getElementById('tgt-dist').innerHTML = dh;
-      const bal = train.class_balance; document.getElementById('cls-bal').innerHTML = bal ? `<div class="alert ${bal < 0.4 ? 'alert-warn' : 'alert-info'}">${bal < 0.4 ? '⚠' : 'ℹ'} Class balance: ${bal}${bal < 0.4 ? ' — balanced weights applied' : ''}</div>` : '';
-      let rows = '';
-      for (const col of train.columns) { const dt = train.dtypes[col] || ''; const mv = train.missing[col] || 0; const mp = train.missing_pct[col] || 0; const tv = train.cat_summary && train.cat_summary[col] ? Object.entries(train.cat_summary[col]).slice(0, 3).map(([k]) => `<span class="tag tag-b" style="margin:1px;font-size:0.67rem">${k}</span>`).join('') : '—'; const tc = dt.includes('float') || dt.includes('int') ? 'tag-g' : 'tag-p'; rows += `<tr><td class="bold">${col}</td><td><span class="tag ${tc}">${dt}</span></td><td>${mv > 0 ? `<span class="tag tag-a">${mv} (${mp}%)</span>` : '<span class="tag tag-g">None</span>'}</td><td>${tv}</td></tr>`; }
+
+      const bal = train.class_balance;
+      document.getElementById('cls-bal').innerHTML = bal ? `<div class="alert ${bal<0.4?'alert-warn':'alert-info'}">${bal<0.4?'⚠':'ℹ'} Class balance: ${bal}${bal<0.4?' — balanced weights applied':''}</div>` : '';
+
+      let rows='';
+      for (const col of train.columns) {
+        const dt=train.dtypes[col]||''; const mv=train.missing[col]||0; const mp=train.missing_pct[col]||0;
+        const tv=train.cat_summary&&train.cat_summary[col]?Object.entries(train.cat_summary[col]).slice(0,3).map(([k])=>`<span class="tag tag-k" style="margin:1px;font-size:0.65rem">${k}</span>`).join(''):'—';
+        const tc=dt.includes('float')||dt.includes('int')?'tag-f':'tag-l';
+        rows+=`<tr><td class="bold">${col}</td><td><span class="tag ${tc}">${dt}</span></td><td>${mv>0?`<span class="tag tag-g">${mv} (${mp}%)</span>`:'<span class="tag tag-f">None</span>'}</td><td>${tv}</td></tr>`;
+      }
       document.getElementById('col-tbl').innerHTML = `<table><thead><tr><th>Column</th><th>Type</th><th>Missing</th><th>Top Values</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
 
-    // ─── EDA ──────────────────────────────────────────────────────────────────────
-    const EDA_LBL = { target_dist: 'Target', missing: 'Missing', experience: 'Experience', education: 'Education', company: 'Company', demographics: 'Demographics', training_hours: 'Training Hrs', cdi: 'CDI', correlation: 'Correlation', feature_target: 'Feature→Target' };
+    // ─── EDA ───────────────────────────────────────────────────────────────────
+    const EDA_LBL = { target_dist:'Target', missing:'Missing', experience:'Experience', education:'Education', company:'Company', demographics:'Demographics', training_hours:'Training Hrs', cdi:'CDI', correlation:'Correlation', feature_target:'Feature→Target' };
+
     async function runEDA() {
       showLdr('Running EDA', 'generating 10 interactive charts…');
       document.getElementById('eda-btn').disabled = true;
       try {
-        const d = await (await fetch('/api/eda', { method: 'POST' })).json();
+        const d = await (await fetch('/api/eda',{method:'POST'})).json();
         if (d.success) {
-          document.getElementById('eda-content').style.display = 'block';
+          document.getElementById('eda-content').style.display='block';
           renderEdaKPIs(d.stats);
-          buildTabs('eda-tabs', 'eda-area', d.charts, EDA_LBL);
-          showAlert('eda-alerts', 'EDA complete — 10 interactive charts generated', 'ok');
+          buildTabs('eda-tabs','eda-area',d.charts,EDA_LBL);
+          showAlert('eda-alerts','EDA complete — 10 interactive charts generated','ok');
           refreshStatus();
-        } else showAlert('eda-alerts', d.error, 'err');
-      } catch (e) { showAlert('eda-alerts', e.message, 'err'); }
-      document.getElementById('eda-btn').disabled = false;
+        } else showAlert('eda-alerts',d.error,'err');
+      } catch(e) { showAlert('eda-alerts',e.message,'err'); }
+      document.getElementById('eda-btn').disabled=false;
       hideLdr();
     }
+
     function renderEdaKPIs(s) {
-      document.getElementById('eda-kpis').innerHTML = `
-    <div class="kpi b"><div class="kpi-label">Candidates</div><div class="kpi-value" style="font-size:1.3rem">${s.total_candidates.toLocaleString()}</div></div>
-    <div class="kpi p"><div class="kpi-label">Seekers</div><div class="kpi-value" style="font-size:1.3rem">${s.seekers.toLocaleString()}</div><div class="kpi-sub">${s.seek_rate}%</div></div>
-    <div class="kpi g"><div class="kpi-label">Stayers</div><div class="kpi-value" style="font-size:1.3rem">${s.stayers.toLocaleString()}</div></div>
-    <div class="kpi a"><div class="kpi-label">Missing %</div><div class="kpi-value" style="font-size:1.3rem">${s.missing_pct}%</div></div>
-    <div class="kpi c"><div class="kpi-label">Avg Train Hrs</div><div class="kpi-value" style="font-size:1.3rem">${s.avg_training_hours}</div></div>
-    <div class="kpi b"><div class="kpi-label">Features</div><div class="kpi-value" style="font-size:1.3rem">${s.features}</div></div>
-    <div class="kpi p"><div class="kpi-label">Numeric</div><div class="kpi-value" style="font-size:1.3rem">${s.numeric_features}</div></div>
-    <div class="kpi g"><div class="kpi-label">Categorical</div><div class="kpi-value" style="font-size:1.3rem">${s.categorical_features}</div></div>`;
+      const items=[
+        ['Candidates',s.total_candidates.toLocaleString(),'t-forest'],
+        ['Seekers',s.seekers.toLocaleString(),'t-sienna'],
+        ['Stayers',s.stayers.toLocaleString(),'t-sage'],
+        ['Missing %',s.missing_pct+'%','t-gold'],
+        ['Avg Train Hrs',s.avg_training_hours,'t-slate'],
+        ['Features',s.features,'t-forest'],
+        ['Numeric',s.numeric_features,'t-sienna'],
+        ['Categorical',s.categorical_features,'t-gold']
+      ];
+      document.getElementById('eda-kpis').innerHTML = items.map(([l,v,c])=>`<div class="stat-tile ${c}"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:1.4rem">${v}</div></div>`).join('');
     }
 
-    // ─── Preprocess ───────────────────────────────────────────────────────────────
+    // ─── Preprocess ────────────────────────────────────────────────────────────
     async function runPrep() {
-      showLdr('Preprocessing', 'engineering features · fitting on train only…');
-      document.getElementById('prep-btn').disabled = true;
+      showLdr('Preprocessing','engineering features · fitting on train only…');
+      document.getElementById('prep-btn').disabled=true;
       try {
-        const d = await (await fetch('/api/preprocess', { method: 'POST' })).json();
+        const d = await (await fetch('/api/preprocess',{method:'POST'})).json();
         if (d.success) {
-          const s = d.summary;
-          document.getElementById('prep-results').style.display = 'block';
-          document.getElementById('prep-kpis').innerHTML = `<div class="kpi b"><div class="kpi-label">Train Rows</div><div class="kpi-value">${s.original_rows.toLocaleString()}</div></div><div class="kpi p"><div class="kpi-label">Features</div><div class="kpi-value">${s.features_created}</div></div><div class="kpi g"><div class="kpi-label">Encoded</div><div class="kpi-value">${s.categorical_encoded}</div></div><div class="kpi a"><div class="kpi-label">Scaled</div><div class="kpi-value">${s.numeric_scaled}</div></div>`;
-          document.getElementById('feat-list').innerHTML = '<div style="line-height:2.6">' + s.feature_names.map(f => `<span class="tag tag-b" style="margin:2px;font-size:0.7rem">${f}</span>`).join('') + '</div>';
-          let fh = ''; for (const [col, strat] of Object.entries(s.fill_strategy || {})) { const c = strat.includes('Unknown') ? 'tag-a' : 'tag-g'; fh += `<div style="margin-bottom:7px;display:flex;align-items:center;gap:9px"><span class="tag ${c}" style="font-size:0.68rem">${col}</span><span class="text-muted" style="font-size:0.8rem">${strat}</span></div>`; }
-          document.getElementById('fill-strat').innerHTML = fh || '<span class="text-muted">No missing values found</span>';
+          const s=d.summary;
+          document.getElementById('prep-results').style.display='block';
+          const colors=['t-forest','t-sienna','t-gold','t-slate'];
+          const kv=[['Train Rows',s.original_rows.toLocaleString()],['Features',s.features_created],['Encoded',s.categorical_encoded],['Scaled',s.numeric_scaled]];
+          document.getElementById('prep-kpis').innerHTML = kv.map(([l,v],i)=>`<div class="stat-tile ${colors[i]}"><div class="stat-label">${l}</div><div class="stat-value">${v}</div></div>`).join('');
+          document.getElementById('feat-list').innerHTML='<div style="line-height:2.6">'+s.feature_names.map(f=>`<span class="tag tag-l" style="margin:2px;font-size:0.67rem">${f}</span>`).join('')+'</div>';
+          let fh='';
+          for (const [col,strat] of Object.entries(s.fill_strategy||{})) { fh+=`<div style="margin-bottom:8px;display:flex;align-items:center;gap:9px"><span class="tag tag-g" style="font-size:0.65rem">${col}</span><span class="text-muted" style="font-size:0.8rem">${strat}</span></div>`; }
+          document.getElementById('fill-strat').innerHTML=fh||'<span class="text-muted">No missing values found</span>';
           renderPreprocessCharts(d.distributions, d.boxplots);
-          showAlert('prep-alerts', `Done — ${s.features_created} features ready`, 'ok');
+          showAlert('prep-alerts',`Done — ${s.features_created} features ready`,'ok');
           refreshStatus();
-        } else showAlert('prep-alerts', d.error, 'err');
-      } catch (e) { showAlert('prep-alerts', e.message, 'err'); }
-      document.getElementById('prep-btn').disabled = false;
+        } else showAlert('prep-alerts',d.error,'err');
+      } catch(e) { showAlert('prep-alerts',e.message,'err'); }
+      document.getElementById('prep-btn').disabled=false;
       hideLdr();
     }
 
     function renderPreprocessCharts(distributions, boxplots) {
       const container = document.getElementById('prep-charts');
       container.innerHTML = '';
+      const lyt = (title) => ({ paper_bgcolor: PAPER, plot_bgcolor: PAPER2, font:{family:'IBM Plex Sans,sans-serif',color:MUT,size:11}, height:280, margin:{l:40,r:20,t:40,b:40}, title:{text:title,font:{family:'DM Serif Display,serif',size:13,color:INK},x:0.02}, xaxis:{gridcolor:RIM,linecolor:RIM}, yaxis:{gridcolor:RIM,linecolor:RIM} });
 
-      const ACCENT = '#3B82F6', VIOLET = '#8B5CF6', EMERALD = '#10B981', PANEL = '#0E1523', PANEL2 = '#141E30', MUTED = '#7A93B8';
-
-      // Distributions
       const distDiv = document.createElement('div');
-      distDiv.innerHTML = '<h4 style="color:#F0F4FF;margin-top:20px">Feature Distributions</h4>';
+      distDiv.innerHTML = '<h4 style="color:var(--ink);font-family:var(--fdisp);font-weight:400;margin:20px 0 12px">Feature Distributions</h4>';
       container.appendChild(distDiv);
 
       distributions.forEach(dist => {
         const chartDiv = document.createElement('div');
-        chartDiv.style = 'width: 100%; height: 300px; margin-bottom: 20px;';
+        chartDiv.style = 'width:100%;height:280px;margin-bottom:18px';
         distDiv.appendChild(chartDiv);
-
         let data = [];
-        if (dist.type === 'numeric') {
-          data = [{
-            type: 'histogram',
-            x: dist.bins.slice(0, -1).map((b, i) => (b + dist.bins[i + 1]) / 2),
-            y: dist.counts,
-            name: dist.feature,
-            marker: { color: ACCENT }
-          }];
-        } else if (dist.type === 'categorical') {
-          data = [{
-            type: 'bar',
-            x: dist.values.map(v => v.category),
-            y: dist.values.map(v => v.count),
-            name: dist.feature,
-            marker: { color: VIOLET }
-          }];
+        if (dist.type==='numeric') {
+          data = [{ type:'histogram', x:dist.bins.slice(0,-1).map((b,i)=>(b+dist.bins[i+1])/2), y:dist.counts, name:dist.feature, marker:{color:FOREST,opacity:.8} }];
+        } else if (dist.type==='categorical') {
+          data = [{ type:'bar', x:dist.values.map(v=>v.category), y:dist.values.map(v=>v.count), name:dist.feature, marker:{color:SLATE,opacity:.8} }];
         }
-
-        const layout = {
-          title: dist.feature,
-          paper_bgcolor: PANEL,
-          plot_bgcolor: PANEL2,
-          font: { family: 'DM Sans', color: MUTED, size: 11 },
-          height: 300,
-          margin: { l: 40, r: 20, t: 40, b: 40 }
-        };
-
-        Plotly.newPlot(chartDiv, data, layout, { responsive: true });
+        Plotly.newPlot(chartDiv, data, lyt(dist.feature), {responsive:true});
       });
 
-      // Boxplots
       const boxDiv = document.createElement('div');
-      boxDiv.innerHTML = '<h4 style="color:#F0F4FF;margin-top:30px">Boxplots & Outliers</h4>';
+      boxDiv.innerHTML = '<h4 style="color:var(--ink);font-family:var(--fdisp);font-weight:400;margin:28px 0 12px">Boxplots & Outliers</h4>';
       container.appendChild(boxDiv);
 
       boxplots.forEach(bp => {
         const chartDiv = document.createElement('div');
-        chartDiv.style = 'width: 100%; height: 300px; margin-bottom: 20px;';
+        chartDiv.style = 'width:100%;height:280px;margin-bottom:18px';
         boxDiv.appendChild(chartDiv);
-
-        const data = [{
-          type: 'box',
-          y: [bp.min, bp.q1, bp.median, bp.q3, bp.max],
-          name: bp.feature,
-          marker: { color: EMERALD },
-          boxpoints: 'outliers',
-          jitter: 0.3,
-          pointpos: -1.8
-        }];
-
-        const layout = {
-          title: `${bp.feature} (Outliers: ${bp.outlier_count})`,
-          paper_bgcolor: PANEL,
-          plot_bgcolor: PANEL2,
-          font: { family: 'DM Sans', color: MUTED, size: 11 },
-          height: 300,
-          margin: { l: 40, r: 20, t: 40, b: 40 }
-        };
-
-        Plotly.newPlot(chartDiv, data, layout, { responsive: true });
+        const data = [{ type:'box', y:[bp.min,bp.q1,bp.median,bp.q3,bp.max], name:bp.feature, marker:{color:SIENNA}, boxpoints:'outliers', jitter:0.3, pointpos:-1.8 }];
+        Plotly.newPlot(chartDiv, data, lyt(`${bp.feature} (Outliers: ${bp.outlier_count})`), {responsive:true});
       });
     }
 
-    // ─── Training ─────────────────────────────────────────────────────────────────
-    const MC = { 'Logistic Regression': 'mc-lr', 'Decision Tree': 'mc-dt', 'Random Forest': 'mc-rf', 'SVM': 'mc-svm', 'KNN': 'mc-knn' };
-    const CHART_LBL = { performance: 'Performance', roc_curves: 'ROC Curves', pr_curves: 'PR Curves', confusion: 'Confusion', radar: 'Radar', feature_importance: 'RF Importance', lr_coefficients: 'LR Coefficients', overfit_diagnostic: 'Overfitting', threshold_tuning: 'Thresholds', cv_scores: 'CV Scores', shap_surrogate: 'Perm Importance' };
+    // ─── Training ──────────────────────────────────────────────────────────────
+    const MC = {'Logistic Regression':'mc-lr','Decision Tree':'mc-dt','Random Forest':'mc-rf','SVM':'mc-svm','KNN':'mc-knn'};
+    const CHART_LBL = { performance:'Performance', roc_curves:'ROC Curves', pr_curves:'PR Curves', confusion:'Confusion', radar:'Radar', feature_importance:'RF Importance', lr_coefficients:'LR Coefficients', overfit_diagnostic:'Overfitting', threshold_tuning:'Thresholds', cv_scores:'CV Scores', shap_surrogate:'Perm Importance' };
 
     async function trainModels() {
-      showLdr('Training 5 models', '80/20 split · evaluating on held-out 20%…');
-      document.getElementById('train-btn').disabled = true;
+      showLdr('Training 5 models','80/20 split · evaluating on held-out 20%…');
+      document.getElementById('train-btn').disabled=true;
       try {
-        const d = await (await fetch('/api/train', { method: 'POST' })).json();
+        const d = await (await fetch('/api/train',{method:'POST'})).json();
         if (d.success) {
           renderModelCards(d.results);
           renderMetricsTable(d.results);
-          buildTabs('chart-tabs', 'chart-area', d.results._charts || {}, CHART_LBL);
+          buildTabs('chart-tabs','chart-area',d.results._charts||{},CHART_LBL);
           renderQuickInsights(d.results);
-          document.getElementById('train-results').style.display = 'block';
-          const mt = d.results._meta || {};
-          showAlert('train-alerts', `Done — best: <strong>${mt.best_model}</strong> · val: ${mt.val_size} rows`, 'ok');
-          renderInterpretability(d.results._interpretability, d.results._charts || {});
+          document.getElementById('train-results').style.display='block';
+          const mt=d.results._meta||{};
+          showAlert('train-alerts',`Done — best: <strong>${mt.best_model}</strong> · val: ${mt.val_size} rows`,'ok');
+          renderInterpretability(d.results._interpretability, d.results._charts||{});
           refreshStatus();
-        } else showAlert('train-alerts', d.error, 'err');
-      } catch (e) { showAlert('train-alerts', e.message, 'err'); }
-      document.getElementById('train-btn').disabled = false;
+        } else showAlert('train-alerts',d.error,'err');
+      } catch(e) { showAlert('train-alerts',e.message,'err'); }
+      document.getElementById('train-btn').disabled=false;
       hideLdr();
     }
+
     function renderModelCards(res) {
-      const names = Object.keys(MC); let best = '', ba = 0;
-      for (const n of names) { if (res[n] && res[n].roc_auc > ba) { ba = res[n].roc_auc; best = n; } }
-      for (const [name, id] of Object.entries(MC)) {
-        const el = document.getElementById(id); if (!el || !res[name]) continue;
-        el.querySelector('.mcard-auc').textContent = res[name].roc_auc.toFixed(3);
-        el.querySelector('.mcard-f1').textContent = 'F1 ' + res[name].f1.toFixed(3);
-        if (res[name].overfit_flag) { let w = el.querySelector('.mcard-warn'); if (!w) { w = document.createElement('div'); w.className = 'mcard-warn'; el.appendChild(w); } w.textContent = '⚠ Overfit'; }
-        if (name === best) { el.classList.add('best'); if (!el.querySelector('.mcard-crown')) { const c = document.createElement('div'); c.className = 'mcard-crown'; c.textContent = '🏆'; el.appendChild(c); } }
+      const names = Object.keys(MC); let best='',ba=0;
+      for (const n of names) { if(res[n]&&res[n].roc_auc>ba){ba=res[n].roc_auc;best=n;} }
+      for (const [name,id] of Object.entries(MC)) {
+        const el=document.getElementById(id); if(!el||!res[name]) continue;
+        el.querySelector('.mcard-auc').textContent=res[name].roc_auc.toFixed(3);
+        el.querySelector('.mcard-f1').textContent='F1 '+res[name].f1.toFixed(3);
+        if (res[name].overfit_flag) { let w=el.querySelector('.mcard-warn'); if(!w){w=document.createElement('div');w.className='mcard-warn';el.appendChild(w);} w.textContent='⚠ Overfit'; }
+        if (name===best) { el.classList.add('best'); if(!el.querySelector('.mcard-crown')){const c=document.createElement('div');c.className='mcard-crown';c.textContent='🏆';el.appendChild(c);} }
       }
-    }
-    function renderMetricsTable(res) {
-      const names = Object.keys(MC); const ms = ['accuracy', 'precision', 'recall', 'f1', 'f1_tuned', 'roc_auc', 'cv_f1_mean'];
-      const ls = ['Accuracy', 'Precision', 'Recall', 'F1 @0.5', 'F1 Tuned', 'ROC-AUC', 'CV F1'];
-      let best = '', ba = 0; for (const n of names) { if (res[n] && res[n].roc_auc > ba) { ba = res[n].roc_auc; best = n; } }
-      let rows = '';
-      for (const n of names) {
-        if (!res[n]) continue; const ib = n === best; const of_ = res[n].overfit_flag;
-        rows += `<tr><td class="bold">${ib ? '🏆 ' : ''}${n}${ib ? '<span class="tag tag-g" style="margin-left:7px;font-size:0.68rem">BEST</span>' : ''}${of_ ? '<span class="tag tag-r" style="margin-left:5px;font-size:0.68rem">OVERFIT</span>' : ''}</td><td class="mono" style="font-size:0.72rem;color:var(--muted)">${res[n].train_f1 ? res[n].train_f1 + '→' + res[n].val_f1 : ''}</td>${ms.map(m => { const v = res[n][m] ?? 0; const c = v >= .8 ? 'var(--emerald)' : v >= .7 ? 'var(--accent)' : v >= .6 ? 'var(--amber)' : 'var(--rose)'; return `<td class="mono" style="color:${c};font-weight:600">${(v * 100).toFixed(1)}%</td>`; }).join('')}</tr>`;
-      }
-      document.getElementById('metrics-tbl').innerHTML = `<table><thead><tr><th>Model</th><th>Train→Val F1</th>${ls.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
-    }
-    function renderQuickInsights(res) {
-      const names = Object.keys(MC).filter(n => res[n]); let best = '', ba = 0;
-      for (const n of names) { if (res[n].roc_auc > ba) { ba = res[n].roc_auc; best = n; } }
-      const br = res[best] || {}; const of = names.filter(n => res[n] && res[n].overfit_flag);
-      document.getElementById('quick-insights').innerHTML = `
-    <div class="ftile"><div class="ftile-icon">🏆</div><h3>Best: ${best}</h3><p>AUC ${br.roc_auc} · F1 ${br.f1} (default) → ${br.f1_tuned} (tuned @ threshold ${br.opt_threshold})</p></div>
-    <div class="ftile"><div class="ftile-icon">${of.length ? '⚠️' : '✅'}</div><h3>Overfitting</h3><p>${of.length ? of.join(', ') + ' show train/val F1 gap >0.15. CV F1 is the real performance estimate.' : 'No significant overfitting. Train and validation F1 gaps are within acceptable range.'}</p></div>
-    <div class="ftile"><div class="ftile-icon">📐</div><h3>Expected Range</h3><p>AUC 0.75–0.85 · F1 0.55–0.65. CV F1 is most trustworthy for imbalanced 25% positive class.</p></div>`;
     }
 
-    // ─── Chart tabs ───────────────────────────────────────────────────────────────
+    function renderMetricsTable(res) {
+      const names=Object.keys(MC); const ms=['accuracy','precision','recall','f1','f1_tuned','roc_auc','cv_f1_mean'];
+      const ls=['Accuracy','Precision','Recall','F1 @0.5','F1 Tuned','ROC-AUC','CV F1'];
+      let best='',ba=0; for(const n of names){if(res[n]&&res[n].roc_auc>ba){ba=res[n].roc_auc;best=n;}}
+      let rows='';
+      for (const n of names) {
+        if(!res[n]) continue; const ib=n===best; const of_=res[n].overfit_flag;
+        rows+=`<tr><td class="bold">${ib?'🏆 ':''}${n}${ib?'<span class="tag tag-f" style="margin-left:7px;font-size:0.64rem">BEST</span>':''}${of_?'<span class="tag tag-s" style="margin-left:5px;font-size:0.64rem">OVERFIT</span>':''}</td><td class="mono" style="font-size:0.7rem;color:var(--ink3)">${res[n].train_f1?res[n].train_f1+'→'+res[n].val_f1:''}</td>${ms.map(m=>{const v=res[n][m]??0;const c=v>=.8?FOREST:v>=.7?SLATE:v>=.6?GOLD:SIENNA;return`<td class="mono" style="color:${c};font-weight:600">${(v*100).toFixed(1)}%</td>`;}).join('')}</tr>`;
+      }
+      document.getElementById('metrics-tbl').innerHTML=`<table><thead><tr><th>Model</th><th>Train→Val F1</th>${ls.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function renderQuickInsights(res) {
+      const names=Object.keys(MC).filter(n=>res[n]); let best='',ba=0;
+      for(const n of names){if(res[n].roc_auc>ba){ba=res[n].roc_auc;best=n;}}
+      const br=res[best]||{}; const of=names.filter(n=>res[n]&&res[n].overfit_flag);
+      document.getElementById('quick-insights').innerHTML=`
+        <div class="ftile"><div class="ftile-icon">🏆</div><h3>Best: ${best}</h3><p>AUC ${br.roc_auc} · F1 ${br.f1} (default) → ${br.f1_tuned} (tuned @ threshold ${br.opt_threshold})</p></div>
+        <div class="ftile"><div class="ftile-icon">${of.length?'⚠️':'✅'}</div><h3>Overfitting</h3><p>${of.length?of.join(', ')+' show train/val F1 gap >0.15. CV F1 is the real performance estimate.':'No significant overfitting. Train and validation F1 gaps are within acceptable range.'}</p></div>
+        <div class="ftile"><div class="ftile-icon">📐</div><h3>Expected Range</h3><p>AUC 0.75–0.85 · F1 0.55–0.65. CV F1 is most trustworthy for imbalanced 25% positive class.</p></div>`;
+    }
+
+    // ─── Chart tabs ────────────────────────────────────────────────────────────
     function buildTabs(tabsId, areaId, charts, lblmap) {
-      const te = document.getElementById(tabsId), ae = document.getElementById(areaId);
-      te.innerHTML = '';
-      const keys = Object.keys(charts).filter(k => charts[k]);
-      keys.forEach((k, i) => {
-        const btn = document.createElement('button'); btn.className = 'ctab' + (i === 0 ? ' active' : ''); btn.textContent = lblmap[k] || k;
-        btn.onclick = () => {
-          te.querySelectorAll('.ctab').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-          ae.innerHTML = `<div id="plt_${k}" style="min-height:400px"></div>`;
-          setTimeout(() => PLOT('plt_' + k, charts[k]), 60);
-        };
+      const te=document.getElementById(tabsId), ae=document.getElementById(areaId);
+      te.innerHTML='';
+      const keys=Object.keys(charts).filter(k=>charts[k]);
+      keys.forEach((k,i)=>{
+        const btn=document.createElement('button'); btn.className='ctab'+(i===0?' active':''); btn.textContent=lblmap[k]||k;
+        btn.onclick=()=>{ te.querySelectorAll('.ctab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); ae.innerHTML=`<div id="plt_${k}" style="min-height:400px"></div>`; setTimeout(()=>PLOT('plt_'+k,charts[k]),60); };
         te.appendChild(btn);
       });
-      if (keys.length) { ae.innerHTML = `<div id="plt_${keys[0]}" style="min-height:400px"></div>`; setTimeout(() => PLOT('plt_' + keys[0], charts[keys[0]]), 100); }
+      if(keys.length){ae.innerHTML=`<div id="plt_${keys[0]}" style="min-height:400px"></div>`;setTimeout(()=>PLOT('plt_'+keys[0],charts[keys[0]]),100);}
     }
 
-    // ─── Interpretability ─────────────────────────────────────────────────────────
+    // ─── Interpretability ──────────────────────────────────────────────────────
     function renderInterpretability(interp, charts) {
-      if (!interp) { document.getElementById('interp-content').innerHTML = '<div class="alert alert-err">✕ No data. Train models first.</div>'; return; }
-      const tf = interp.top_features || [], lrd = interp.lr_directions || [], kr = interp.key_rules || [];
-      let html = '';
-      html += `<div class="interp-card"><div class="interp-card-title">🌲 Random Forest — Top Driving Features (by Impurity Importance)</div>`;
-      tf.forEach((f, i) => {
-        const barW = Math.round(f.importance / (tf[0]?.importance || 1) * 100);
-        const rankColors = ['var(--emerald)', 'var(--accent)', '#a78bfa', 'var(--amber)', 'var(--muted)', 'var(--muted)'];
-        html += `<div class="feat-item"><div class="feat-rank" style="color:${rankColors[i]}">#${i + 1}</div><div style="flex:1"><div class="feat-name">${f.feature}</div><div class="feat-dir">${f.direction}</div><div class="feat-bar-wrap"><div class="feat-bar-track"><div class="feat-bar-fill" style="width:${barW}%"></div></div><div class="feat-bar-pct">${f.pct}%</div></div></div></div>`;
+      if(!interp){document.getElementById('interp-content').innerHTML='<div class="alert alert-err">✕ No data. Train models first.</div>';return;}
+      const tf=interp.top_features||[], lrd=interp.lr_directions||[], kr=interp.key_rules||[];
+      let html='';
+      html+=`<div class="interp-card"><div class="interp-card-title">🌲 Random Forest — Top Driving Features (by Impurity Importance)</div>`;
+      tf.forEach((f,i)=>{
+        const barW=Math.round(f.importance/(tf[0]?.importance||1)*100);
+        const rankColors=[FOREST,SLATE,SIENNA,GOLD,MUT,MUT];
+        html+=`<div class="feat-item"><div class="feat-rank" style="color:${rankColors[i]}">#${i+1}</div><div style="flex:1"><div class="feat-name">${f.feature}</div><div class="feat-dir">${f.direction}</div><div class="feat-bar-wrap"><div class="feat-bar-track"><div class="feat-bar-fill" style="width:${barW}%"></div></div><div class="feat-bar-pct">${f.pct}%</div></div></div></div>`;
       });
-      html += `</div>`;
-      if (lrd.length) {
-        html += `<div class="g2"><div class="interp-card"><div class="interp-card-title">📈 Logistic Regression — Coefficient Directions<br><small style="font-size:0.72rem;color:var(--muted);font-weight:400">Positive → pushes toward job-seeking &nbsp;·&nbsp; Negative → pushes toward staying</small></div>`;
-        lrd.forEach(d => { const c = d.coef > 0 ? 'var(--rose)' : 'var(--accent)'; const tc = d.coef > 0 ? 'tag-r' : 'tag-b'; html += `<div class="lr-item"><div class="lr-feat">${d.feature}</div><div class="lr-coef" style="color:${c}">${d.coef > 0 ? '+' : ''}${d.coef}</div><span class="tag ${tc}" style="font-size:0.68rem">${d.push}</span></div>`; });
-        html += `</div>`;
-        if (kr.length) {
-          html += `<div class="interp-card"><div class="interp-card-title">🌿 Decision Tree — Most Frequent Split Features<br><small style="font-size:0.72rem;color:var(--muted);font-weight:400">Features the DT uses most often to make decisions</small></div>`;
-          kr.forEach((r, i) => { html += `<div class="lr-item"><div class="lr-feat">${i === 0 ? '🥇' : '  '} ${r.feature}</div><div class="lr-coef" style="color:var(--accent)">${r.split_count} splits</div></div>`; });
-          html += `</div></div>`;
+      html+=`</div>`;
+      if(lrd.length){
+        html+=`<div class="g2"><div class="interp-card"><div class="interp-card-title">📈 Logistic Regression — Coefficient Directions<br><small style="font-size:0.7rem;color:var(--ink3);font-weight:400">Positive → pushes toward job-seeking &nbsp;·&nbsp; Negative → pushes toward staying</small></div>`;
+        lrd.forEach(d=>{const c=d.coef>0?SIENNA:FOREST;const tc=d.coef>0?'tag-s':'tag-f';html+=`<div class="lr-item"><div class="lr-feat">${d.feature}</div><div class="lr-coef" style="color:${c}">${d.coef>0?'+':''}${d.coef}</div><span class="tag ${tc}" style="font-size:0.64rem">${d.push}</span></div>`;});
+        html+=`</div>`;
+        if(kr.length){
+          html+=`<div class="interp-card"><div class="interp-card-title">🌿 Decision Tree — Most Frequent Split Features<br><small style="font-size:0.7rem;color:var(--ink3);font-weight:400">Features the DT uses most often to make decisions</small></div>`;
+          kr.forEach((r,i)=>{html+=`<div class="lr-item"><div class="lr-feat">${i===0?'🥇  ':' '}${r.feature}</div><div class="lr-coef" style="color:${SLATE}">${r.split_count} splits</div></div>`;});
+          html+=`</div></div>`;
         }
       }
-      if (charts.shap_surrogate) html += `<div class="card"><div class="card-title mb-2" style="margin-bottom:10px">🔬 Permutation Importance — Validation Set (Model-Agnostic)</div><p class="text-muted" style="margin-bottom:14px;font-size:0.8rem">Measures how much ROC-AUC drops when each feature is randomly shuffled on the held-out validation set. Unlike impurity importance, this is not biased by feature cardinality.</p><div id="perm-chart" style="min-height:480px"></div></div>`;
-      if (charts.feature_importance) html += `<div class="card"><div class="card-title mb-2" style="margin-bottom:14px">📊 RF Feature Importance (Impurity-Based)</div><div id="rf-imp-chart" style="min-height:480px"></div></div>`;
-      if (charts.lr_coefficients) html += `<div class="card"><div class="card-title mb-2" style="margin-bottom:14px">📉 Logistic Regression Coefficients</div><div id="lr-coef-chart" style="min-height:480px"></div></div>`;
-      document.getElementById('interp-content').innerHTML = html;
-      setTimeout(() => {
-        if (charts.shap_surrogate) PLOT('perm-chart', charts.shap_surrogate);
-        if (charts.feature_importance) PLOT('rf-imp-chart', charts.feature_importance);
-        if (charts.lr_coefficients) PLOT('lr-coef-chart', charts.lr_coefficients);
-      }, 100);
+      if(charts.shap_surrogate) html+=`<div class="panel"><div class="panel-title mb-2" style="margin-bottom:10px">🔬 Permutation Importance — Validation Set (Model-Agnostic)</div><p class="text-muted" style="margin-bottom:14px;font-size:0.8rem">Measures how much ROC-AUC drops when each feature is randomly shuffled on the held-out validation set.</p><div id="perm-chart" style="min-height:480px"></div></div>`;
+      if(charts.feature_importance) html+=`<div class="panel"><div class="panel-title mb-2" style="margin-bottom:14px">📊 RF Feature Importance (Impurity-Based)</div><div id="rf-imp-chart" style="min-height:480px"></div></div>`;
+      if(charts.lr_coefficients) html+=`<div class="panel"><div class="panel-title mb-2" style="margin-bottom:14px">📉 Logistic Regression Coefficients</div><div id="lr-coef-chart" style="min-height:480px"></div></div>`;
+      document.getElementById('interp-content').innerHTML=html;
+      setTimeout(()=>{
+        if(charts.shap_surrogate) PLOT('perm-chart',charts.shap_surrogate);
+        if(charts.feature_importance) PLOT('rf-imp-chart',charts.feature_importance);
+        if(charts.lr_coefficients) PLOT('lr-coef-chart',charts.lr_coefficients);
+      },100);
     }
 
-    // ─── Prediction ───────────────────────────────────────────────────────────────
+    // ─── Prediction ────────────────────────────────────────────────────────────
     async function runPred() {
-      showLdr('Generating predictions', 'inference on aug_test.csv…');
+      showLdr('Generating predictions','inference on aug_test.csv…');
       try {
-        const m = document.getElementById('model-sel').value;
-        const d = await (await fetch('/api/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: m }) })).json();
-        if (d.success) {
-          document.getElementById('pred-results').style.display = 'block';
-          const mt = d.meta;
-          document.getElementById('pred-kpis').innerHTML = `<div class="kpi b"><div class="kpi-label">Model</div><div class="kpi-value" style="font-size:1rem">${mt.model_used}</div></div><div class="kpi p"><div class="kpi-label">Total Preds</div><div class="kpi-value">${mt.total_predictions.toLocaleString()}</div></div><div class="kpi g"><div class="kpi-label">Seekers</div><div class="kpi-value">${mt.predicted_seekers.toLocaleString()}</div><div class="kpi-sub">${mt.seek_rate}%</div></div><div class="kpi a"><div class="kpi-label">Stayers</div><div class="kpi-value">${mt.predicted_stayers.toLocaleString()}</div></div><div class="kpi c"><div class="kpi-label">Threshold</div><div class="kpi-value">${mt.opt_threshold || '0.50'}</div></div>`;
-          const rows = d.preview.map(r => `<tr><td class="mono">${r.enrollee_id}</td><td class="mono" style="color:${r.target > .5 ? '#a78bfa' : 'var(--accent)'};font-weight:600">${(+r.target).toFixed(4)}</td><td><span class="tag ${r.target > .5 ? 'tag-p' : 'tag-b'}">${r.target > .5 ? 'JOB SEEKING' : 'STAYING'}</span></td></tr>`).join('');
-          document.getElementById('sub-preview').innerHTML = `<table><thead><tr><th>Enrollee ID</th><th>Target Probability</th><th>Prediction</th></tr></thead><tbody>${rows}</tbody></table>`;
-          showAlert('pred-alerts', `Done — <strong>${mt.model_used}</strong> · ${mt.predicted_seekers} seekers (${mt.seek_rate}%)`, 'ok');
+        const m=document.getElementById('model-sel').value;
+        const d=await (await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:m})})).json();
+        if(d.success){
+          document.getElementById('pred-results').style.display='block';
+          const mt=d.meta;
+          const colors=['t-forest','t-sienna','t-sage','t-gold','t-slate'];
+          const kv=[['Model',mt.model_used],['Total Preds',mt.total_predictions.toLocaleString()],['Seekers',mt.predicted_seekers.toLocaleString()],['Stayers',mt.predicted_stayers.toLocaleString()],['Threshold',mt.opt_threshold||'0.50']];
+          document.getElementById('pred-kpis').innerHTML=kv.map(([l,v],i)=>`<div class="stat-tile ${colors[i]}"><div class="stat-label">${l}</div><div class="stat-value" style="${l==='Model'?'font-size:0.9rem':''}">${v}</div></div>`).join('');
+          const rows=d.preview.map(r=>`<tr><td class="mono">${r.enrollee_id}</td><td class="mono" style="color:${r.target>.5?SIENNA:FOREST};font-weight:600">${(+r.target).toFixed(4)}</td><td><span class="tag ${r.target>.5?'tag-s':'tag-f'}">${r.target>.5?'JOB SEEKING':'STAYING'}</span></td></tr>`).join('');
+          document.getElementById('sub-preview').innerHTML=`<table><thead><tr><th>Enrollee ID</th><th>Target Probability</th><th>Prediction</th></tr></thead><tbody>${rows}</tbody></table>`;
+          showAlert('pred-alerts',`Done — <strong>${mt.model_used}</strong> · ${mt.predicted_seekers} seekers (${mt.seek_rate}%)`,'ok');
           refreshStatus();
-        } else showAlert('pred-alerts', d.error, 'err');
-      } catch (e) { showAlert('pred-alerts', e.message, 'err'); }
+        } else showAlert('pred-alerts',d.error,'err');
+      } catch(e){showAlert('pred-alerts',e.message,'err');}
       hideLdr();
     }
-    function dlSub() { window.location.href = '/api/download-submission'; }
 
-    // ─── Auto Pipeline ────────────────────────────────────────────────────────────
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-    async function autoPipeline() {
-      goTo('data', document.querySelector('[data-s=data]')); await sleep(150);
-      await loadData(); if (!pState.data_loaded) return;
-      goTo('eda', document.querySelector('[data-s=eda]')); await sleep(150);
+    function dlSub() { window.location.href='/api/download-submission'; }
+
+    // ─── Auto Pipeline ─────────────────────────────────────────────────────────
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    async function autoPipeline(){
+      goTo('data',document.querySelector('[data-s=data]')); await sleep(150);
+      await loadData(); if(!pState.data_loaded) return;
+      goTo('eda',document.querySelector('[data-s=eda]')); await sleep(150);
       await runEDA();
-      goTo('prep', document.querySelector('[data-s=prep]')); await sleep(150);
+      goTo('prep',document.querySelector('[data-s=prep]')); await sleep(150);
       await runPrep();
-      goTo('train', document.querySelector('[data-s=train]')); await sleep(150);
+      goTo('train',document.querySelector('[data-s=train]')); await sleep(150);
       await trainModels();
-      goTo('pred', document.querySelector('[data-s=pred]')); await sleep(150);
+      goTo('pred',document.querySelector('[data-s=pred]')); await sleep(150);
       await runPred();
     }
 
-    // ─── Insight charts (static data, rendered on page load) ─────────────────────
+    // ─── Insight charts (static data) ─────────────────────────────────────────
     function buildInsightCharts() {
-      const BG = '#0E1523', BG2 = '#141E30', RIM = '#1F2D45', TXT = '#F0F4FF', MUT = '#7A93B8';
-      const BLUE = '#3B82F6', VIO = '#7C3AED', GRN = '#10B981', AMB = '#F59E0B', ROSE = '#F43F5E', CYAN = '#06B6D4';
-      const lyt = (title, h = 340) => ({ paper_bgcolor: BG, plot_bgcolor: BG2, font: { family: 'Inter,sans-serif', color: MUT, size: 12 }, height: h, margin: { l: 55, r: 20, t: 50, b: 70 }, title: { text: title, font: { family: 'Space Grotesk,sans-serif', size: 14, color: TXT }, x: 0.02 }, xaxis: { gridcolor: RIM, linecolor: RIM, tickfont: { color: MUT, size: 11 } }, yaxis: { gridcolor: RIM, linecolor: RIM, tickfont: { color: MUT, size: 11 } }, legend: { bgcolor: 'rgba(0,0,0,0)', font: { color: MUT, size: 11 } } });
+      const lyt = (title, h=320) => ({
+        paper_bgcolor:PAPER, plot_bgcolor:PAPER2,
+        font:{family:'IBM Plex Sans,sans-serif',color:MUT,size:12},
+        height:h, margin:{l:55,r:20,t:50,b:70},
+        title:{text:title,font:{family:'DM Serif Display,serif',size:14,color:INK},x:0.02},
+        xaxis:{gridcolor:RIM,linecolor:RIM,tickfont:{color:MUT,size:11}},
+        yaxis:{gridcolor:RIM,linecolor:RIM,tickfont:{color:MUT,size:11}},
+        legend:{bgcolor:'rgba(0,0,0,0)',font:{color:MUT,size:11}}
+      });
 
       // Chart 1 — Experience
-      const expX = ['<1', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '>20'];
-      const expSeek = [45.4, 42.4, 33.2, 35.3, 32.6, 28.8, 28.2, 29.5, 24.3, 21.7, 21.0, 22.7, 18.6, 19.3, 18.3, 16.6, 14.2, 16.7, 15.4, 17.4, 22.3, 15.3];
-      const expCnt = [522, 549, 1127, 1354, 1403, 1430, 1216, 1028, 802, 980, 985, 664, 494, 399, 586, 686, 508, 342, 280, 304, 148, 3286];
-      Plotly.newPlot('chart-exp', [
-        { type: 'bar', x: expX, y: expCnt, name: 'Candidate Count', marker: { color: BLUE, opacity: .6 }, hovertemplate: '%{x} yrs: %{y:,} candidates<extra></extra>' },
-        { type: 'scatter', x: expX, y: expSeek, name: 'Seek Rate %', yaxis: 'y2', mode: 'lines+markers', line: { color: VIO, width: 2.5 }, marker: { size: 6, color: VIO }, hovertemplate: '%{x} yrs: %{y:.1f}% seek<extra></extra>' }
-      ], { ...lyt('Experience vs Job-Seeking Rate', 360), barmode: 'group', yaxis2: { overlaying: 'y', side: 'right', tickfont: { color: VIO, size: 11 }, title: { text: 'Seek Rate %', font: { color: VIO } }, gridcolor: 'rgba(0,0,0,0)' } }, PCFG);
+      const expX=['<1','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','>20'];
+      const expSeek=[45.4,42.4,33.2,35.3,32.6,28.8,28.2,29.5,24.3,21.7,21.0,22.7,18.6,19.3,18.3,16.6,14.2,16.7,15.4,17.4,22.3,15.3];
+      const expCnt=[522,549,1127,1354,1403,1430,1216,1028,802,980,985,664,494,399,586,686,508,342,280,304,148,3286];
+      Plotly.newPlot('chart-exp',[
+        {type:'bar',x:expX,y:expCnt,name:'Candidate Count',marker:{color:FOREST,opacity:.55},hovertemplate:'%{x} yrs: %{y:,} candidates<extra></extra>'},
+        {type:'scatter',x:expX,y:expSeek,name:'Seek Rate %',yaxis:'y2',mode:'lines+markers',line:{color:SIENNA,width:2.5},marker:{size:6,color:SIENNA},hovertemplate:'%{x} yrs: %{y:.1f}% seek<extra></extra>'}
+      ],{...lyt('Experience vs Job-Seeking Rate',360),yaxis2:{overlaying:'y',side:'right',tickfont:{color:SIENNA,size:11},title:{text:'Seek Rate %',font:{color:SIENNA}},gridcolor:'rgba(0,0,0,0)'}},PCFG);
 
       // Chart 2 — Training hours
-      const thX = ['0-20 hrs', '21-50 hrs', '51-100 hrs', '101-200 hrs', '200+ hrs'];
-      const thY = [25.1, 25.9, 24.5, 24.8, 20.1];
-      Plotly.newPlot('chart-training', [
-        { type: 'bar', x: thX, y: thY, marker: { color: [ROSE, ROSE, AMB, AMB, GRN], opacity: .85 }, text: thY.map(v => v + '%'), textposition: 'outside', hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' }
-      ], { ...lyt('Training Hours vs Job-Seeking Rate (%)', 320), yaxis: { ...lyt('').yaxis, range: [0, 32], title: { text: 'Seek Rate %', font: { color: MUT } } } }, PCFG);
+      const thX=['0-20 hrs','21-50 hrs','51-100 hrs','101-200 hrs','200+ hrs'];
+      const thY=[25.1,25.9,24.5,24.8,20.1];
+      Plotly.newPlot('chart-training',[
+        {type:'bar',x:thX,y:thY,marker:{color:[SIENNA,SIENNA,GOLD,GOLD,FOREST],opacity:.85},text:thY.map(v=>v+'%'),textposition:'outside',hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'}
+      ],{...lyt('Training Hours vs Job-Seeking Rate (%)',300),yaxis:{...lyt('').yaxis,range:[0,32],title:{text:'Seek Rate %',font:{color:MUT}}}},PCFG);
 
       // Chart 3 — Company size
-      const csX = ['<10', '50-99', '100-500', '500-999', '1000-4999', '5000-9999', '10000+'];
-      const csY = [17.1, 17.7, 16.1, 17.3, 15.1, 18.1, 19.1];
-      Plotly.newPlot('chart-cosize', [
-        { type: 'bar', x: csX, y: csY, marker: { color: csY.map(v => v > 18 ? ROSE : v > 16.5 ? AMB : BLUE), opacity: .9 }, text: csY.map(v => v + '%'), textposition: 'outside', hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' }
-      ], { ...lyt('Company Size vs Job-Seeking Rate (%)', 320), xaxis: { ...lyt('').xaxis, tickangle: 20 }, yaxis: { ...lyt('').yaxis, range: [0, 24] } }, PCFG);
+      const csX=['<10','50-99','100-500','500-999','1000-4999','5000-9999','10000+'];
+      const csY=[17.1,17.7,16.1,17.3,15.1,18.1,19.1];
+      Plotly.newPlot('chart-cosize',[
+        {type:'bar',x:csX,y:csY,marker:{color:csY.map(v=>v>18?SIENNA:v>16.5?GOLD:FOREST),opacity:.9},text:csY.map(v=>v+'%'),textposition:'outside',hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'}
+      ],{...lyt('Company Size vs Job-Seeking Rate (%)',300),xaxis:{...lyt('').xaxis,tickangle:20},yaxis:{...lyt('').yaxis,range:[0,24]}},PCFG);
 
       // Chart 4 — Education
-      const eduX = ['Graduate', 'Masters', 'High School', 'Phd', 'Primary School'];
-      const eduY = [28.0, 21.4, 19.5, 14.0, 13.3];
-      Plotly.newPlot('chart-edu', [
-        { type: 'bar', x: eduX, y: eduY, marker: { color: [ROSE, VIO, BLUE, GRN, GRN], opacity: .9 }, text: eduY.map(v => v + '%'), textposition: 'outside', hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' }
-      ], { ...lyt('Education Level vs Job-Seeking Rate (%)', 320), yaxis: { ...lyt('').yaxis, range: [0, 34] } }, PCFG);
+      const eduX=['Graduate','Masters','High School','Phd','Primary School'];
+      const eduY=[28.0,21.4,19.5,14.0,13.3];
+      Plotly.newPlot('chart-edu',[
+        {type:'bar',x:eduX,y:eduY,marker:{color:[SIENNA,SLATE,FOREST,SAGE,SAGE],opacity:.9},text:eduY.map(v=>v+'%'),textposition:'outside',hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'}
+      ],{...lyt('Education Level vs Job-Seeking Rate (%)',300),yaxis:{...lyt('').yaxis,range:[0,34]}},PCFG);
 
-      // Chart 5 — CDI buckets
-      const cdiX = ['<0.50', '0.50–0.65', '0.65–0.75', '0.75–0.85', '0.85–0.95'];
-      const cdiY = [58.7, 58.2, 27.3, 19.4, 16.0];
-      Plotly.newPlot('chart-cdi', [
-        { type: 'bar', x: cdiX, y: cdiY, marker: { color: cdiY.map(v => v > 40 ? ROSE : v > 25 ? AMB : GRN), opacity: .9 }, text: cdiY.map(v => v + '%'), textposition: 'outside', hovertemplate: 'CDI %{x}: %{y:.1f}% seek<extra></extra>' },
-        { type: 'scatter', x: cdiX, y: [25, 25, 25, 25, 25], mode: 'lines', name: 'Dataset avg (25%)', line: { color: MUT, dash: 'dot', width: 1.5 }, hoverinfo: 'skip' }
-      ], { ...lyt('City Development Index vs Job-Seeking Rate (%)', 320), yaxis: { ...lyt('').yaxis, range: [0, 70], title: { text: 'Seek Rate %', font: { color: MUT } } } }, PCFG);
+      // Chart 5 — CDI
+      const cdiX=['<0.50','0.50–0.65','0.65–0.75','0.75–0.85','0.85–0.95'];
+      const cdiY=[58.7,58.2,27.3,19.4,16.0];
+      Plotly.newPlot('chart-cdi',[
+        {type:'bar',x:cdiX,y:cdiY,marker:{color:cdiY.map(v=>v>40?SIENNA:v>25?GOLD:FOREST),opacity:.9},text:cdiY.map(v=>v+'%'),textposition:'outside',hovertemplate:'CDI %{x}: %{y:.1f}% seek<extra></extra>'},
+        {type:'scatter',x:cdiX,y:[25,25,25,25,25],mode:'lines',name:'Dataset avg (25%)',line:{color:MUT,dash:'dot',width:1.5},hoverinfo:'skip'}
+      ],{...lyt('City Development Index vs Job-Seeking Rate (%)',300),yaxis:{...lyt('').yaxis,range:[0,70],title:{text:'Seek Rate %',font:{color:MUT}}}},PCFG);
 
-      // Chart 6 — University enrollment
-      const enrX = ['No Enrollment', 'Part-time', 'Full-time'];
-      const enrY = [22.1, 23.8, 32.3];
-      Plotly.newPlot('chart-enroll', [
-        { type: 'bar', x: enrX, y: enrY, marker: { color: [BLUE, AMB, VIO], opacity: .9 }, text: enrY.map(v => v + '%'), textposition: 'outside', hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' }
-      ], { ...lyt('University Enrollment vs Job-Seeking Rate (%)', 300), yaxis: { ...lyt('').yaxis, range: [0, 40] } }, PCFG);
+      // Chart 6 — Enrollment
+      const enrX=['No Enrollment','Part-time','Full-time'];
+      const enrY=[22.1,23.8,32.3];
+      Plotly.newPlot('chart-enroll',[
+        {type:'bar',x:enrX,y:enrY,marker:{color:[FOREST,GOLD,SIENNA],opacity:.9},text:enrY.map(v=>v+'%'),textposition:'outside',hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'}
+      ],{...lyt('University Enrollment vs Job-Seeking Rate (%)',280),yaxis:{...lyt('').yaxis,range:[0,40]}},PCFG);
 
       // Chart 7 — Gender
-      const genX = ['Female', 'Male', 'Other'];
-      const genY = [26.3, 22.8, 26.2];
-      const genN = [1238, 13221, 191];
-      Plotly.newPlot('chart-gender', [
-        { type: 'bar', x: genX, y: genY, name: 'Seek Rate %', marker: { color: [VIO, BLUE, CYAN], opacity: .9 }, text: genY.map(v => v.toFixed(1) + '%'), textposition: 'outside', hovertemplate: '%{x}: %{y:.1f}%<extra></extra>' },
-        { type: 'scatter', x: genX, y: [25, 25, 25], mode: 'lines', name: 'Average', line: { color: MUT, dash: 'dot', width: 1.5 }, hoverinfo: 'skip' }
-      ], { ...lyt('Gender vs Job-Seeking Rate (%)', 280), yaxis: { ...lyt('').yaxis, range: [0, 32] } }, PCFG);
+      const genX=['Female','Male','Other'];
+      const genY=[26.3,22.8,26.2];
+      Plotly.newPlot('chart-gender',[
+        {type:'bar',x:genX,y:genY,name:'Seek Rate %',marker:{color:[SIENNA,FOREST,SLATE],opacity:.9},text:genY.map(v=>v.toFixed(1)+'%'),textposition:'outside',hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'},
+        {type:'scatter',x:genX,y:[25,25,25],mode:'lines',name:'Average',line:{color:MUT,dash:'dot',width:1.5},hoverinfo:'skip'}
+      ],{...lyt('Gender vs Job-Seeking Rate (%)',260),yaxis:{...lyt('').yaxis,range:[0,32]}},PCFG);
 
-      // Chart 8 — Class imbalance donut
-      Plotly.newPlot('chart-imbalance', [
-        {
-          type: 'pie', values: [75.1, 24.9], labels: ['Staying (0)', 'Job Seeking (1)'], hole: .55,
-          marker: { colors: [BLUE, VIO], line: { color: BG, width: 3 } },
-          textfont: { size: 13, color: TXT }, textinfo: 'label+percent',
-          hovertemplate: '%{label}: %{value:.1f}%<extra></extra>'
-        }
-      ], { paper_bgcolor: BG, plot_bgcolor: BG, font: { family: 'Inter', color: MUT, size: 12 }, height: 290, margin: { l: 20, r: 20, t: 50, b: 20 }, title: { text: 'Class Distribution — 75/25 Imbalance', font: { family: 'Space Grotesk', size: 14, color: TXT }, x: 0.02 }, showlegend: true, legend: { bgcolor: 'rgba(0,0,0,0)', font: { color: MUT, size: 12 } } }, PCFG);
+      // Chart 8 — Class imbalance
+      Plotly.newPlot('chart-imbalance',[
+        {type:'pie',values:[75.1,24.9],labels:['Staying (0)','Job Seeking (1)'],hole:.5,
+          marker:{colors:[FOREST,SIENNA],line:{color:PAPER,width:3}},
+          textfont:{size:13,color:'#fff'},textinfo:'label+percent',
+          hovertemplate:'%{label}: %{value:.1f}%<extra></extra>'}
+      ],{paper_bgcolor:PAPER,plot_bgcolor:PAPER,font:{family:'IBM Plex Sans',color:MUT,size:12},height:280,margin:{l:20,r:20,t:50,b:20},title:{text:'Class Distribution — 75/25 Imbalance',font:{family:'DM Serif Display,serif',size:14,color:INK},x:0.02},showlegend:true,legend:{bgcolor:'rgba(0,0,0,0)',font:{color:MUT,size:12}}},PCFG);
     }
 
-    // ─── Init ─────────────────────────────────────────────────────────────────────
+    // ─── Init ──────────────────────────────────────────────────────────────────
     refreshStatus();
-    // Build insight charts as soon as DOM is ready
-    window.addEventListener('DOMContentLoaded', () => setTimeout(buildInsightCharts, 300));
-    // If already loaded
-    if (document.readyState !== 'loading') setTimeout(buildInsightCharts, 300);
+    window.addEventListener('DOMContentLoaded', ()=>setTimeout(buildInsightCharts,300));
+    if (document.readyState!=='loading') setTimeout(buildInsightCharts,300);
   </script>
 </body>
-
 </html>
+Done
